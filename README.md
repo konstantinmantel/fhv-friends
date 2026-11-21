@@ -2,6 +2,8 @@
 
 **Dein Campus. Deine Leute.** Eine studentische Web-App für die FHV in Dornbirn.
 
+[App öffnen](https://konstantinmantel.github.io/fhv-friends/) · [Öffentliches Repository](https://github.com/konstantinmantel/fhv-friends)
+
 ## Was gebaut ist
 
 - **Home / Feed:** ÖH-Pins, Kategorien, Suche, Likes, Merkliste und Kommentare.
@@ -17,11 +19,13 @@
 
 ## Ehrlicher Status
 
-Die interaktive Demo ist lokal gebaut. Die Supabase-Anbindung und das Datenbankschema sind vorbereitet, aber **noch nicht mit einem echten Supabase-Projekt verbunden oder gegen eine laufende Datenbank getestet**. Demo-Inhalte und -Nachrichten bleiben auf dem jeweiligen Gerät. Es werden keine echten Personen benachrichtigt.
+Die interaktive Demo ist unter https://konstantinmantel.github.io/fhv-friends/ veröffentlicht. Die Supabase-Anbindung und das Datenbankschema sind vorbereitet, aber **noch nicht mit einem echten Supabase-Projekt verbunden oder gegen eine laufende Datenbank getestet**. Demo-Inhalte und -Nachrichten bleiben auf dem jeweiligen Gerät. Es werden keine echten Personen benachrichtigt.
 
-Das öffentliche Repository ist unter [konstantinmantel/fhv-friends](https://github.com/konstantinmantel/fhv-friends) verfügbar. Die Web-App wird über GitHub Pages veröffentlicht. Supabase ist der vorgesehene gemeinsame Datenspeicher; bis zur Konfiguration läuft die App als klar gekennzeichnete Demo.
+Das öffentliche Repository ist unter [konstantinmantel/fhv-friends](https://github.com/konstantinmantel/fhv-friends) verfügbar. Die Web-App ist über GitHub Pages veröffentlicht. Supabase ist der vorgesehene gemeinsame Datenspeicher; bis zur Konfiguration läuft die App als klar gekennzeichnete Demo.
 
-Die JavaScript-Logik wird durch automatisierte Tests geprüft. Visuelle Browserprüfung ist in dieser Umgebung noch nicht erfolgt: der lokale Serverstart ist gesperrt und der Browser lässt keine lokalen `file:`-URLs zu.
+Tests und Produktionsbuild sind auch in GitHub Actions erfolgreich. Der veröffentlichte Stand wurde im Browser auf Desktop und bei 390 px Breite geprüft; Zusagen und das Erstellen eines Nachhilfe-Beitrags wurden in der lokalen Demo erfolgreich getestet.
+
+Die Supabase-Organisation **FHV Friends** wurde im **Free-Tarif** angelegt. Das Projektformular ist für **Frankfurt** mit aktivierter RLS-Voreinstellung vorbereitet. Zum Erstellen des eigentlichen Datenbankprojekts fehlt noch das vom Verantwortlichen selbst zu setzende Datenbankpasswort.
 
 ## Sofort ansehen
 
