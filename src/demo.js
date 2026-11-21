@@ -3,7 +3,7 @@ const aliases={'demo-lena':'demo-profile-2','demo-felix':'demo-profile-3','demo-
 export const demoId=id=>aliases[id]||id;
 export function emptyDemoAccount(){return {joined:[],saved:[],liked:[],invitations:[]};}
 export function createDemoWorld(saved=null,legacy=null){
- if(saved?.version===2 && Array.isArray(saved.profiles) && saved.profiles.length===4){saved.connections??=[];return saved;}
+ if(saved?.version===2 && Array.isArray(saved.profiles) && saved.profiles.length===4){saved.connections??=[];if(!saved.extras_20261121){for(const {author,...p} of demoPosts().filter(p=>['beerpong','gluehwein','ride-bregenz'].includes(p.id)))if(!saved.posts.some(x=>x.id===p.id))saved.posts.push(p);saved.extras_20261121=true;}return saved;}
  const profiles=DEMO_PROFILES.map(p=>({...p,interests:[]}));
  if(legacy?.user?.name && legacy.user.name!=='Alex' && legacy.user.name!=='Profil 1')Object.assign(profiles[0],legacy.user,{id:'demo-you',role:'student'});
  const accounts=Object.fromEntries(profiles.map(p=>[p.id,emptyDemoAccount()]));
@@ -12,7 +12,7 @@ export function createDemoWorld(saved=null,legacy=null){
  const samples=demoPosts();
  const custom=(legacy?.posts||[]).filter(p=>!samples.some(s=>s.id===p.id)||p.author_id==='demo-you').map(({author,...p})=>p);
  const posts=[...custom,...samples.filter(p=>!custom.some(c=>c.id===p.id)).map(({author,...p})=>p)];
- return {version:2,profiles,accounts,posts,connections:[],comments:legacy?.comments||{},chats:(legacy?.chats||[]).map(c=>({...c,members:c.members||['demo-you',demoId(c.peer_id)].filter(Boolean)})),messages:legacy?.messages||{}};
+ return {version:2,extras_20261121:true,profiles,accounts,posts,connections:[],comments:legacy?.comments||{},chats:(legacy?.chats||[]).map(c=>({...c,members:c.members||['demo-you',demoId(c.peer_id)].filter(Boolean)})),messages:legacy?.messages||{}};
 }
 export function demoPerson(world,id){return world.profiles.find(p=>p.id===demoId(id))||Object.values(PEOPLE).find(p=>p.id===id)||{id,name:'Testprofil',color:'blue'};}
 export function hydrateDemoPosts(world){return world.posts.map(p=>({...p,author_id:demoId(p.author_id),author:demoPerson(world,p.author_id),join_count:Object.values(world.accounts).filter(a=>a.joined.includes(p.id)).length,likes:Object.values(world.accounts).filter(a=>a.liked.includes(p.id)).length}));}

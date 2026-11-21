@@ -448,3 +448,40 @@ select { appearance: none; padding-right: 35px; background: white url("data:imag
 .message-compose input { flex:1; min-width:0; }
 .sr-only { position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0; }
 @media(max-width:760px){.header-actions {gap:6px}.person-actions .btn {flex:1}.franzi-messages{max-height:36vh}}
+
+/* A little campus colour, with space for real photos and people. */
+:root { background:#f7f8f6; --muted:#636b72; }
+.content-layout { max-width:960px; }
+.header-main h1 { font-weight:750; font-size:32px; }
+.page-header { margin-bottom:24px; }
+.sidebar .brand { border-bottom:5px solid var(--fhv-blue); padding-bottom:15px; margin-bottom:24px; }
+.sidebar .side-link:nth-child(2).active { background:var(--fhv-purple); }
+.sidebar .side-link:nth-child(3).active { background:var(--fhv-yellow); }
+.campus-actions { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; margin:0 0 24px; }
+.campus-actions button { display:flex; flex-direction:column; align-items:flex-start; justify-content:space-between; gap:17px; text-align:left; border-radius:12px; padding:17px; min-height:97px; background:var(--fhv-blue); transition:transform .15s ease; }
+.campus-actions button:nth-child(2) { background:var(--fhv-green); }
+.campus-actions button:nth-child(3) { background:var(--fhv-purple); }
+.campus-actions button:nth-child(4) { background:var(--fhv-yellow); }
+.campus-actions button span { font-size:14px; font-weight:650; }
+.campus-actions button:hover { transform:translateY(-2px); }
+.post-card { border:1px solid #e3e7e3; box-shadow:0 2px 9px #1b292204; border-top:3px solid var(--fhv-blue); border-radius:14px; }
+.post-card.tone-lavender { border-top-color:var(--fhv-purple); }
+.post-card.tone-yellow { border-top-color:var(--fhv-yellow); }
+.post-card.tone-green { border-top-color:var(--fhv-green); }
+.post-card.tone-coral { border-top-color:var(--fhv-coral); }
+.pinned-post { background:#fff0b5; border-color:#ead78e; border-left:5px solid var(--fhv-yellow); border-radius:13px; padding:24px; }
+.pinned-post h2 { font-size:25px; }
+.card-title h3 { font-size:21px; }
+.card-description { color:#515b63; }
+.example-label { color:#7c8388; font-size:11px; margin-left:auto; }
+.card-kicker { flex-wrap:wrap; }
+.ride-route { display:flex; align-items:center; gap:6px; width:100%; margin-top:4px; color:#3e5b38; }
+.ride-detail { display:flex; align-items:center; gap:14px; padding:17px; border-radius:10px; background:#e7f3dc; margin:18px 0; }
+.ride-detail strong { font-size:16px; }
+.ride-detail p { font-size:14px; margin-top:4px; }
+[hidden] { display:none!important; }
+.chat-back { margin-bottom:15px; }
+.franzi-button { background:var(--fhv-purple); }
+.franzi-avatar svg { stroke-width:1.5; }
+@media(max-width:760px){.content-layout{padding-left:20px;padding-right:20px}.campus-actions{gap:8px;margin-bottom:20px}.campus-actions button{padding:12px 10px;min-height:85px;gap:13px}.campus-actions button span{font-size:11px}.header-main h1{font-size:29px}.pinned-post{padding:20px}.pinned-post h2{font-size:23px}.post-card{border-radius:12px}.card-title h3{font-size:20px}}
+@media(prefers-reduced-motion:reduce){.campus-actions button{transition:none}}

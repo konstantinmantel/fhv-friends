@@ -33,3 +33,9 @@ test('calendar uses UTC and escapes user supplied newlines and separators',()=>{
  assert.equal(ics.split('BEGIN:VEVENT').length,2);
 });
 test('profile initials work for names and empty profiles',()=>{assert.equal(initials('Lena Mantel'),'LM');assert.equal(initials('ÖH FHV'),'ÖF');});
+
+test('carpool offers validate route and available seats independently of ordinary events',()=>{
+ const ride={...valid,category:'Mitfahren',ride_destination:'Bregenz Bahnhof',capacity:1};
+ assert.equal(validatePost(ride),null);
+ for(const change of [{ride_destination:''},{capacity:0},{capacity:9},{type:'help'}])assert.equal(typeof validatePost({...ride,...change}),'string');
+});

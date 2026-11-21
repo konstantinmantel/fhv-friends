@@ -36,7 +36,7 @@ test('bookmarks and likes toggle and persist; details render without template er
  await a.detail('salad');assert.match(element('#overlay').innerHTML,/Allergene/);
 });
 test('direct and group chats create one conversation and never fake incoming messages',async()=>{
- const {a}=await app();await a.contact('salad');await a.contact('salad');assert.equal(a.state.chats.length,1);assert.equal(a.state.messages[a.state.chats[0].id].length,0);
+ const {a,element}=await app();await a.contact('salad');assert.doesNotMatch(element('#overlay').innerHTML,/&lt;button class/);await a.contact('salad');assert.equal(a.state.chats.length,1);assert.equal(a.state.messages[a.state.chats[0].id].length,0);
  await a.joinActivity('hike');await a.groupChat('hike');assert.equal(a.state.chats.length,2);assert.equal(a.state.chats[1].post_id,'hike');
 });
 test('create and edit forms render safe text and the help category in the right place',async()=>{
@@ -82,4 +82,10 @@ test('connections require the recipient to accept and direct messages work witho
 });
 test('Franzi opens without downloading a model and identifies campus-only mode',async()=>{
  const {a,element}=await app();a.actions.franzi();const html=element('#overlay').innerHTML;assert.match(html,/Franzi/);assert.match(html,/Lokale KI aktivieren/);assert.match(html,/Ohne KI/);
+});
+
+test('Beerpong, Glühwein and carpool offers are included and rides have their own form',async()=>{
+ const {a,element}=await app();for(const id of ['beerpong','gluehwein','ride-bregenz'])assert.ok(a.state.posts.some(p=>p.id===id));
+ a.createModal('activity',null,true);let html=element('#overlay').innerHTML;assert.match(html,/name="ride_destination"/);assert.match(html,/Freie Plätze/);assert.match(html,/Mitfahren/);
+ await a.detail('ride-bregenz');html=element('#overlay').innerHTML;assert.match(html,/Bregenz Bahnhof/);assert.match(html,/3 Plätze frei/);
 });

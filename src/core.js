@@ -1,6 +1,6 @@
 export const VALID_DOMAINS = new Set(['students.fhv.at', 'fhv.at']);
 export const TYPES = { activity: 'Aktivität', trade: 'Verkaufen & Verschenken', food: 'Essen teilen', help: 'Hilfe & Nachhilfe', life: 'Campusleben' };
-export const CATEGORIES = ['Alle','Outdoor','Sport','Food','Kultur','Lernen','Campus'];
+export const CATEGORIES = ['Alle','Outdoor','Sport','Food','Kultur','Lernen','Campus','Mitfahren'];
 export function validEmail(value) { const email = String(value || '').trim().toLowerCase(); return /^[a-z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-z0-9.-]+$/.test(email) && VALID_DOMAINS.has(email.split('@')[1]); }
 export function escapeHtml(value = '') { return String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 export const initials = name => String(name || '?').split(/\s+/).slice(0,2).map(x=>x[0]).join('').toUpperCase();
@@ -29,7 +29,8 @@ export function validatePost(input) {
   if (input.description.length > 3000) return 'Die Beschreibung darf höchstens 3000 Zeichen haben.';
   if (!input.location?.trim()) return 'Wähle einen Treffpunkt.';
   if (input.type === 'activity' && (!input.starts_at || !Number.isFinite(new Date(input.starts_at).getTime()) || new Date(input.starts_at) <= new Date())) return 'Wähle ein Datum in der Zukunft.';
-  if (input.capacity !== null && input.capacity !== undefined && (!Number.isInteger(Number(input.capacity)) || Number(input.capacity)<2 || Number(input.capacity)>500)) return 'Die Teilnehmerzahl muss zwischen 2 und 500 liegen.';
+  if (input.capacity !== null && input.capacity !== undefined && (!Number.isInteger(Number(input.capacity)) || Number(input.capacity)<(input.category==='Mitfahren'?1:2) || Number(input.capacity)>500)) return 'Die Teilnehmerzahl muss zwischen 2 und 500 liegen.';
+  if(input.category==='Mitfahren' && (input.type!=='activity' || !input.ride_destination?.trim() || input.ride_destination.length>150 || !Number.isInteger(Number(input.capacity)) || Number(input.capacity)<1 || Number(input.capacity)>8)) return 'Für die Fahrgemeinschaft: Ziel und 1 bis 8 freie Plätze angeben.';
   if (input.price !== undefined && (!Number.isFinite(Number(input.price)) || Number(input.price)<0 || Number(input.price)>10000)) return 'Gib einen gültigen Preis zwischen 0 und 10.000 € ein.';
   return null;
 }

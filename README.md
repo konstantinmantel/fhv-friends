@@ -61,6 +61,10 @@ Trade / Help trennt Verkäufe (Preis > 0 €) von Geschenken. Profilnamen öffne
 
 Franzi beantwortet App-Fragen sofort als klar bezeichnete Campus-Hilfe. Allgemeine KI-Antworten nutzen optional Qwen3 1.7B über WebLLM 0.2.89, lokal im Browser. Der ungefähr 1 GB große Modelldownload startet nur nach Klick; WebGPU und ausreichend Gerätespeicher sind erforderlich. Bibliothek und Modell kommen von externen CDNs, Fragen und Antworten werden lokal verarbeitet. Keine kostenpflichtige API, keine API-Schlüssel. Auf nicht unterstützten Geräten bleibt nur die Campus-Hilfe verfügbar. Kleine lokale Modelle liefern begrenzte Qualität und keine Live-Informationen.
 
+## Fahrgemeinschaften und neue Beispiele
+
+Fahrgemeinschaften sind Aktivitäten in der Kategorie Mitfahren. Anbieter:innen erfassen Abfahrt, Ziel, Zeitpunkt, 1–8 freie Plätze und Kostenbeitrag pro Person. Zusagen nutzen dieselbe Kapazitätsprüfung wie Aktivitäten. Bestehende Datenbanken benötigen Migration 004. Beerpong und Glühwein sind als ausdrücklich gekennzeichnete Beispiel-Events mit vorgeschlagenen Terminen ergänzt. Sie werden bestehenden lokalen Demos einmalig hinzugefügt.
+
 ## Sofort ansehen
 
 `FHV-Friends.html` ist eine eigenständige HTML-Demo mit eingebetteten Styles, Illustrationen und JavaScript. Herunterladen und per Doppelklick im Browser öffnen. Die Installation als PWA braucht die gehostete HTTPS-Version; sie funktioniert nicht aus einer lokalen Datei.

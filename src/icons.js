@@ -1,4 +1,7 @@
 const paths = {
+ franzi:'<path d="M13 12c-3-5-9-2-8 3 1 5 9 6 13 1 5-6 1-13-5-13-7 0-11 8-7 14 3 5 11 5 15-1"/>',
+ car:'<path d="m4 10 2-6h12l2 6M3 10h18v9H3zM6 19v2m12-2v2M6 14h2m8 0h2"/>',
+ cup:'<path d="M5 8h12v8a6 6 0 0 1-12 0V8Zm12 1h2a3 3 0 0 1 0 6h-2M8 2v3m5-3v3"/>',
  home:'<path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/>',
  trade:'<path d="M4 7h15m-5-5 5 5-5 5M20 17H5m5-5-5 5 5 5"/>',
  calendar:'<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M16 3v4M8 3v4M3 11h18"/>',
