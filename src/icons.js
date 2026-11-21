@@ -1,0 +1,53 @@
+const paths = {
+ home:'<path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/>',
+ trade:'<path d="M4 7h15m-5-5 5 5-5 5M20 17H5m5-5-5 5 5 5"/>',
+ calendar:'<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M16 3v4M8 3v4M3 11h18"/>',
+ user:'<circle cx="12" cy="8" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2"/>',
+ plus:'<path d="M12 5v14M5 12h14"/>',
+ bell:'<path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/>',
+ chat:'<path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5 10 10 0 0 1-4-.8L3 21l1.8-5.5a10 10 0 0 1-.8-4 8.5 8.5 0 0 1 17 0Z"/><path d="M8 11h.01M12 11h.01M16 11h.01"/>',
+ search:'<circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/>',
+ chevron:'<path d="m9 5 7 7-7 7"/>',
+ down:'<path d="m6 9 6 6 6-6"/>',
+ close:'<path d="m6 6 12 12M6 18 18 6"/>',
+ check:'<path d="m5 12 4 4L19 6"/>',
+ heart:'<path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0l-1 1-1-1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z"/>',
+ bookmark:'<path d="M6 3h12a1 1 0 0 1 1 1v18l-7-4-7 4V4a1 1 0 0 1 1-1Z"/>',
+ map:'<path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/>',
+ clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+ people:'<circle cx="9" cy="7" r="3"/><path d="M2 21v-3a7 7 0 0 1 14 0v3M17 4a3 3 0 0 1 0 6M18 14a6 6 0 0 1 4 6"/>',
+ pin:'<path d="m16 3 5 5-4 2-3 6-2-2-7 7M3 8l5-5 2 4 6 3-6 6-3-6Z"/>',
+ coffee:'<path d="M4 8h13v7a6 6 0 0 1-12 0V8M17 9h1a3 3 0 0 1 0 6h-1M7 2v2M12 2v2M2 22h18"/>',
+ book:'<path d="M12 5v16M3 3c4-1 7 0 9 2 2-2 5-3 9-2v16c-4-1-7 0-9 2-2-2-5-3-9-2Z"/>',
+ sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1 1M18 18l1 1M5 19l1-1M18 6l1-1"/>',
+ mountain:'<path d="m2 21 7-15 5 9 3-5 5 11ZM6 12l3 2 3-2"/>',
+ spark:'<path d="m12 3 2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5ZM20 2v4M18 4h4"/>',
+ shield:'<path d="m12 2 9 4v6c0 5-9 10-9 10S3 17 3 12V6z"/><path d="m8 12 3 3 5-6"/>',
+ mail:'<rect x="2" y="4" width="20" height="16" rx="3"/><path d="m2 5 10 8L22 5"/>',
+ send:'<path d="m22 2-7 20-4-9-9-4 20-7ZM22 2 11 13"/>',
+ settings:'<path d="M4 7h16M4 17h16"/><circle cx="9" cy="7" r="3" fill="currentColor"/><circle cx="15" cy="17" r="3" fill="currentColor"/>',
+ logout:'<path d="M9 21H4V3h5M10 12h12m-5-5 5 5-5 5"/>',
+ download:'<path d="M12 3v12m-5-5 5 5 5-5M4 17v4h16v-4"/>',
+ share:'<path d="M12 16V2m-5 5 5-5 5 5M5 11H3v11h18V11h-2"/>',
+ flag:'<path d="M4 22V3c5-4 11 4 16 0v12c-5 4-11-4-16 0"/>',
+ trash:'<path d="M3 6h18M9 6V3h6v3M5 6l1 16h12l1-16M10 10v8M14 10v8"/>',
+ more:'<circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/>',
+ wifi:'<path d="M2 7a16 16 0 0 1 20 0M5 11a11 11 0 0 1 14 0M8 15a6 6 0 0 1 8 0M12 20h.01"/>',
+ leaf:'<path d="M20 3c-17-1-19 12-11 15 9 4 13-7 11-15ZM4 22 16 9"/>',
+};
+export function icon(name,size=22,cls='') { return `<svg class="icon ${cls}" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths[name] || paths.spark}</svg>`; }
+export function artwork(type,cls='') {
+const common = 'xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 300"';
+const drawings = {
+ coffee:`<rect width="500" height="300" fill="#a6ceed"/><path d="M0 250Q130 175 260 230T500 210V300H0Z" fill="#95bfdf"/><ellipse cx="286" cy="248" rx="130" ry="15" fill="#6d9eb9" opacity=".2"/><g transform="translate(120 52) rotate(-9 90 90)"><ellipse cx="100" cy="190" rx="95" ry="17" fill="#f5f3e9"/><path d="M161 68h30a36 36 0 0 1 0 72h-30" fill="none" stroke="#fffcf1" stroke-width="18"/><path d="M23 57h150l-8 99q-6 41-66 41t-66-41Z" fill="#fffdf1"/><ellipse cx="98" cy="57" rx="75" ry="19" fill="#e8e2cc"/><ellipse cx="98" cy="58" rx="63" ry="13" fill="#62452d"/><path d="M82 20q-15-18 0-33M111 20q15-18 0-33" stroke="#fff" stroke-width="5" opacity=".7" fill="none" stroke-linecap="round"/></g><g transform="translate(326 148) rotate(18)"><rect width="78" height="78" rx="16" fill="#f9dd6c"/><g fill="#262723"><circle cx="22" cy="22" r="6"/><circle cx="56" cy="22" r="6"/><circle cx="39" cy="39" r="6"/><circle cx="22" cy="56" r="6"/><circle cx="56" cy="56" r="6"/></g></g><path d="m400 59 5 12 13 2-10 9 3 13-12-7-12 7 3-13-10-9 13-2Z" fill="#fffbec"/><circle cx="63" cy="76" r="7" fill="#f9dd6c"/>`,
+ mountain:`<rect width="500" height="300" fill="#cee0db"/><circle cx="377" cy="68" r="33" fill="#fae89a"/><path d="m0 239 152-191 142 191 80-112 126 134v39H0Z" fill="#95b39d"/><path d="m62 161 90-113 85 114-54-19-31 23-28-25Z" fill="#f8f8f2"/><path d="m0 280 178-114 125 86 82-31 115 59v20H0Z" fill="#50725e"/><path d="M160 300q20-50 75-61t55-40" fill="none" stroke="#e7d8ac" stroke-width="14"/><g transform="translate(278 183)" stroke="#1c3023" stroke-width="5" stroke-linecap="round"><circle cx="0" cy="0" r="8" fill="#1c3023"/><path d="m0 12-6 29 15 17M-6 41l-14 17M0 15l17 12m-27-4-11 15"/><path d="m22 19-2 43" stroke-width="3"/><rect x="-17" y="12" width="12" height="23" rx="4" fill="#e8a873" stroke="none"/></g>`,
+ run:`<rect width="500" height="300" fill="#bab0cf"/><circle cx="397" cy="57" r="65" fill="#d2c9e2"/><path d="M-40 280Q150 50 550 196" stroke="#eee7ef" stroke-width="90" fill="none"/><path d="M-40 280Q150 50 550 196" stroke="#fdf9fa" stroke-width="2" stroke-dasharray="15 20" fill="none"/><g transform="translate(197 80) rotate(-18)"><path d="M14 9h67v81l90 30q17 8 16 30H-3V89Z" fill="#f9df74"/><path d="M-3 143h190v13H-3Z" fill="#fdfcf5"/><path d="M56 93h38M70 104h39M86 114h35" stroke="#1c1e1a" stroke-width="5"/><path d="M14 10h67v19H14" fill="#fdfcf5"/></g>`,
+ salad:`<rect width="500" height="300" fill="#eef0e4"/><ellipse cx="250" cy="170" rx="143" ry="90" fill="#dbe0cf"/><path d="M109 147h282q-12 123-141 123T109 147Z" fill="#fdfdf8"/><ellipse cx="250" cy="147" rx="140" ry="53" fill="#b7c991"/><g fill="#6f944b"><ellipse cx="196" cy="125" rx="37" ry="17" transform="rotate(-30 196 125)"/><ellipse cx="281" cy="148" rx="41" ry="19" transform="rotate(20 281 148)"/><ellipse cx="323" cy="126" rx="26" ry="17"/><ellipse cx="229" cy="155" rx="29" ry="18"/></g><g fill="#dc795f"><circle cx="218" cy="119" r="16"/><circle cx="304" cy="160" r="17"/><circle cx="171" cy="156" r="15"/></g><g fill="#fff8d7"><rect x="255" y="112" width="25" height="22" rx="3" transform="rotate(20 255 112)"/><rect x="219" y="159" width="23" height="20" rx="3" transform="rotate(-15 219 159)"/></g>`,
+ lamp:`<rect width="500" height="300" fill="#e9dfef"/><ellipse cx="262" cy="272" rx="123" ry="14" fill="#cbbcd3"/><path d="M174 263h151" stroke="#272925" stroke-width="13" stroke-linecap="round"/><path d="m253 260 29-119-91-62" stroke="#33362e" stroke-width="12" fill="none"/><circle cx="282" cy="141" r="13" fill="#33362e"/><path d="m160 46 63 45-71 79-55-39Z" fill="#e0a04e"/><path d="m97 131 55 39-70 71-63-44Z" fill="#fae7a2" opacity=".7"/>`,
+ math:`<rect width="500" height="300" fill="#f7e795"/><g transform="translate(125 35) rotate(-8 125 120)"><rect width="250" height="250" rx="12" fill="#fffdf3"/><path d="M35 63h180M35 103h180M35 143h180M35 183h180" stroke="#dddac7" stroke-width="2"/><text x="45" y="110" fill="#373b33" font-size="42" font-family="Georgia,serif">∫ x² dx</text><text x="52" y="185" fill="#818a73" font-size="33" font-family="Georgia,serif">= x³ / 3 + C</text></g><path d="m371 76 14 8-86 163-20 15 2-25Z" fill="#547760"/>`,
+ boulder:`<rect width="500" height="300" fill="#e69a7e"/><path d="m59 300 23-266 225-27 127 293Z" fill="#dfd4c7"/><path d="m280 15-20 135 70 150M83 47l179 103-130 150" stroke="#b3a591" stroke-width="2" fill="none"/><g fill="#789a7a"><path d="m160 58 22 9-5 14-23-2Z"/><path d="m291 99 20-7 9 17-23 5Z"/><path d="m130 218 23 4-3 19-23-6Z"/></g><g fill="#b6a1cf"><path d="m225 155 30 6-4 15-28-3Z"/><path d="m316 250 23-9 15 14-25 9Z"/></g><g stroke="#35372e" stroke-width="8" stroke-linecap="round" fill="none"><circle cx="220" cy="102" r="12" fill="#35372e"/><path d="m219 120-14 40 30 36M207 157l-42 23M222 123l67-20M213 127l-33-48"/></g>`,
+ skis:`<rect width="500" height="300" fill="#c6d8e6"/><path d="m0 222 135-99 134 123 100-81 131 83v52H0Z" fill="#f7f8f2"/><g transform="translate(206 9) rotate(18 40 140)"><rect width="29" height="280" rx="15" fill="#dc8266"/><rect x="53" width="29" height="280" rx="15" fill="#f4dc72"/><path d="M0 75h29M53 75h29M0 90h29M53 90h29" stroke="#272a24" stroke-width="7"/><rect x="7" y="120" width="15" height="48" rx="4" fill="#33372e"/><rect x="60" y="120" width="15" height="48" rx="4" fill="#33372e"/></g>`,
+ study:`<rect width="500" height="300" fill="#d8e1cf"/><rect x="105" y="36" width="280" height="193" rx="14" fill="#353e34"/><rect x="118" y="49" width="254" height="166" rx="5" fill="#f6f3e5"/><path d="M74 229h342l25 25q0 15-30 15H79q-30 0-30-15Z" fill="#a5b19d"/><path d="M146 83h100M146 106h195M146 129h174M146 152h130" stroke="#b9c7b1" stroke-width="9" stroke-linecap="round"/><circle cx="331" cy="179" r="21" fill="#eed678"/>`,
+};
+return `<svg class="artwork ${cls}" ${common} role="img" aria-label="${({coffee:'Kaffee und Brettspiele',mountain:'Wandern am Karren',run:'Gemeinsam laufen',salad:'Frisch zubereiteter Salat',lamp:'Schreibtischlampe',math:'Gemeinsam Mathematik lernen',boulder:'Bouldern',skis:'Skier',study:'Gemeinsam lernen'})[type]||'Campus Community'}">${drawings[type]||drawings.study}</svg>`;
+}
