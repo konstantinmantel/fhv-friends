@@ -1,8 +1,36 @@
 # FHV Friends
 
-**Dein Campus. Deine Leute.** Eine studentische Web-App für die FHV in Dornbirn.
+Eine studentische Web-App für die FHV in Dornbirn.
 
 [App öffnen](https://konstantinmantel.github.io/fhv-friends/) · [Öffentliches Repository](https://github.com/konstantinmantel/fhv-friends)
+
+## Testprofile und Wrapper
+
+Unter **Profil → Testprofil wechseln** gibt es vier bearbeitbare Demo-Profile.
+Name, Studiengang, Beschreibung, Interessen und Profilfoto lassen sich selbst
+setzen. Beiträge können eigene Fotos bekommen. Zusagen und Merklisten sind je
+Profil getrennt; Beiträge und berechtigte Chats teilen sich die Testprofile im
+Browser dieses Geräts. Es sind **keine vier echten Supabase-Login-Konten** und
+keine geräteübergreifenden Accounts. Bestehende lokale Demo-Eingaben werden
+übernommen.
+
+Fotos werden vor dem Speichern verkleinert. Erlaubt sind JPG, PNG und WebP bis
+8 MB. Für den kleinen Testbetrieb werden komprimierte Rasterdaten gespeichert;
+die vorbereiteten Datenbankfelder bleiben durch RLS auf bestätigte FHV-Konten
+beschränkt. Bei einer größeren Einführung kann dies auf Supabase Storage
+umgestellt werden. Für bereits installierte Datenbanken gibt es die additive
+Migration `supabase/migrations/002_photos.sql`. Neue Projekte verwenden direkt
+`supabase/schema.sql`.
+
+Für Android enthält `android/` einen nativen URL-Wrapper mit App-Icon,
+Zurück-Navigation und System-Fotoauswahl. Der Workflow **Android URL wrapper**
+baut eine Test-APK. [Build und Download](https://github.com/konstantinmantel/fhv-friends/actions/workflows/android.yml).
+Die App lädt die veröffentlichte HTTPS-Adresse; Website-Änderungen erscheinen
+auch im Wrapper. Das APK wurde noch nicht auf einem physischen Android-Gerät
+getestet. Kalenderexport benötigt dort derzeit den normalen Browser.
+
+Auf iPhone/iPad genügt **Safari → Teilen → Zum Home-Bildschirm**. Diese PWA-
+Installation öffnet die App ohne Browserleiste.
 
 ## Was gebaut ist
 
@@ -116,7 +144,7 @@ Vor einem echten Campus-Rollout noch erforderlich: Live-Datenbanktests mit minde
 - `src/core.js` — Filter, Mailprüfung, Beitragsvalidierung und Kalenderexport
 - `src/api.js` — Supabase Auth und REST-Anbindung, ohne zusätzliche SDK-Abhängigkeit
 - `src/data.js` — ausdrücklich fiktive Demo-Inhalte
-- `src/icons.js` — Icons und eigene SVG-Illustrationen
+- `src/icons.js` — schlichte Icons
 - `src/styles.css` — responsive Oberfläche
 - `supabase/schema.sql` — Schema, RLS, Rollen, Trigger und RPCs
 - `public/` — PWA, Icons und öffentliche Konfiguration
@@ -132,4 +160,4 @@ Vor einem echten Campus-Rollout noch erforderlich: Live-Datenbanktests mit minde
 
 ## Lizenz und Bildmarke
 
-Code und selbst erstellte Illustrationen: MIT, siehe `LICENSE`. Die FHV-Bildmarke wurde aus der offiziellen FHV-Webseite übernommen und ist davon ausgenommen. FHV Friends ist ein studentischer Prototyp und kein offizieller Hochschuldienst.
+Code und selbst erstellte Icons: MIT, siehe `LICENSE`. Die FHV-Bildmarke wurde aus der offiziellen FHV-Webseite übernommen und ist davon ausgenommen. FHV Friends ist ein studentischer Prototyp und kein offizieller Hochschuldienst.

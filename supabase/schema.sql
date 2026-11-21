@@ -9,6 +9,7 @@ create table public.profiles (
  id uuid primary key references auth.users(id) on delete cascade,
  name text not null check(char_length(name) between 2 and 80),
  course text not null default '' check(char_length(course)<=100),
+ avatar_data text check(avatar_data is null or (char_length(avatar_data)<=120000 and avatar_data ~ '^data:image/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$')),
  bio text not null default '' check(char_length(bio)<=400),
  interests text[] not null default '{}' check(cardinality(interests)<=8),
  color text not null default 'blue' check(color in ('blue','yellow','lavender','coral','green')),
@@ -48,6 +49,7 @@ create table public.posts (
  id uuid primary key default gen_random_uuid(),
  author_id uuid not null references public.profiles(id) on delete cascade,
  type text not null check(type in ('activity','trade','food','help','life')),
+ image_data text check(image_data is null or (char_length(image_data)<=210000 and image_data ~ '^data:image/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$')),
  title text not null check(char_length(trim(title)) between 4 and 100),
  description text not null check(char_length(trim(description)) between 10 and 3000),
  category text not null default 'Campus' check(category in ('Outdoor','Sport','Food','Kultur','Lernen','Campus')),
@@ -204,9 +206,9 @@ $$;
 -- writable through the client API. Only the bounded RPCs above can change them.
 revoke all on all tables in schema public from anon, authenticated;
 grant select on public.profiles,public.posts,public.participants,public.bookmarks,public.likes,public.comments,public.invitations,public.conversations,public.messages,public.reports to authenticated;
-grant update(name,course,bio,interests,color) on public.profiles to authenticated;
-grant insert(author_id,type,title,description,category,location,starts_at,capacity,price,help_direction,pinned) on public.posts to authenticated;
-grant update(title,description,category,location,starts_at,capacity,price,help_direction,pinned,status) on public.posts to authenticated;
+grant update(name,course,bio,interests,color,avatar_data) on public.profiles to authenticated;
+grant insert(author_id,type,title,description,category,location,starts_at,capacity,price,help_direction,pinned,image_data) on public.posts to authenticated;
+grant update(title,description,category,location,starts_at,capacity,price,help_direction,pinned,status,image_data) on public.posts to authenticated;
 grant delete on public.posts to authenticated;
 grant insert,delete on public.bookmarks,public.likes to authenticated;
 grant insert(post_id,author_id,body) on public.comments to authenticated;
