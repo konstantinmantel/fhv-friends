@@ -13,7 +13,7 @@ async function app() {
 }
 test('initial app renders English navigation without presentation clutter',async()=>{
  const {a,element}=await app();let html=element('#app').innerHTML;assert.match(html,/FHV/);assert.match(html,/riends/);assert.match(html,/Search campus/);assert.doesNotMatch(html,/Demo ·|campus-actions|example-label/);assert.match(html,/ui-icons.svg#fhv/);assert.match(html,/ui-icons.svg#envelope/);for(const x of ['Feed','Trade \/ Help','Activities','Profile'])assert.ok(html.includes(x));
- a.navigate('trade');html=element('#app').innerHTML;assert.match(html,/Help/);assert.match(html,/Campus spots/);assert.doesNotMatch(html,/Karren hike on Saturday\?<\/h3>/);
+ a.navigate('trade');html=element('#app').innerHTML;assert.match(html,/Help/);assert.doesNotMatch(html,/Campus spots|Listings|Search listings|segment-control|search-box/);assert.doesNotMatch(html,/Karren hike on Saturday\?<\/h3>/);
  a.navigate('activities');html=element('#app').innerHTML;assert.match(html,/My plans/);assert.doesNotMatch(html,/Spare couscous salad/);
  a.navigate('profile');assert.match(element('#app').innerHTML,/Edit profile/);assert.match(element('#app').innerHTML,/Your campus/);assert.match(element('#app').innerHTML,/system-icon/);await a.actions.about();assert.match(element('#overlay').innerHTML,/not shared with other devices/);
 });
