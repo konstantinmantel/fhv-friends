@@ -55,6 +55,12 @@ Tests und Produktionsbuild sind auch in GitHub Actions erfolgreich. Der veröffe
 
 Die Supabase-Organisation **FHV Friends** wurde im **Free-Tarif** angelegt. Das Projektformular ist für **Frankfurt** mit aktivierter RLS-Voreinstellung vorbereitet. Zum Erstellen des eigentlichen Datenbankprojekts fehlt noch das vom Verantwortlichen selbst zu setzende Datenbankpasswort.
 
+## Neu: Verkaufen, Kontakte und Franzi
+
+Trade / Help trennt Verkäufe (Preis > 0 €) von Geschenken. Profilnamen öffnen das Profil; Direktnachrichten funktionieren auch ohne Beitrag. Kontakte senden eine Anfrage, die die andere Person annimmt. In der Demo bleiben Profile, Anfragen und Nachrichten auf demselben Gerät. Für ein bestehendes Supabase-Projekt `supabase/migrations/003_connections.sql` ausführen; das vollständige Schema enthält sie bereits.
+
+Franzi beantwortet App-Fragen sofort als klar bezeichnete Campus-Hilfe. Allgemeine KI-Antworten nutzen optional Qwen3 0.6B über WebLLM 0.2.89, lokal im Browser. Der mehrhundert MB große Modelldownload startet nur nach Klick; WebGPU und ausreichend Gerätespeicher sind erforderlich. Bibliothek und Modell kommen von externen CDNs, Fragen und Antworten werden lokal verarbeitet. Keine kostenpflichtige API, keine API-Schlüssel. Auf nicht unterstützten Geräten bleibt nur die Campus-Hilfe verfügbar. Kleine lokale Modelle liefern begrenzte Qualität und keine Live-Informationen.
+
 ## Sofort ansehen
 
 `FHV-Friends.html` ist eine eigenständige HTML-Demo mit eingebetteten Styles, Illustrationen und JavaScript. Herunterladen und per Doppelklick im Browser öffnen. Die Installation als PWA braucht die gehostete HTTPS-Version; sie funktioniert nicht aus einer lokalen Datei.

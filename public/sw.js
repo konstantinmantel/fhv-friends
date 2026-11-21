@@ -1,5 +1,5 @@
-const CACHE = 'fhv-friends-v2';
-const ASSETS = ['./','./index.html','./src/app.js','./src/core.js','./src/api.js','./src/data.js','./src/demo.js','./src/icons.js','./src/styles.css','./config.js','./icon.svg','./icon-192.png','./icon-512.png','./manifest.webmanifest'];
+const CACHE = 'fhv-friends-v3';
+const ASSETS = ['./','./index.html','./src/app.js','./src/core.js','./src/api.js','./src/data.js','./src/demo.js','./src/franzi.js','./src/icons.js','./src/styles.css','./config.js','./icon.svg','./icon-192.png','./icon-512.png','./manifest.webmanifest'];
 self.addEventListener('install', event => { event.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS))); });
 self.addEventListener('activate', event => { event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k))))); self.clients.claim(); });
 self.addEventListener('fetch', event => {

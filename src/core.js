@@ -1,5 +1,5 @@
 export const VALID_DOMAINS = new Set(['students.fhv.at', 'fhv.at']);
-export const TYPES = { activity: 'Aktivität', trade: 'Tauschen & Verschenken', food: 'Essen teilen', help: 'Hilfe & Nachhilfe', life: 'Campusleben' };
+export const TYPES = { activity: 'Aktivität', trade: 'Verkaufen & Verschenken', food: 'Essen teilen', help: 'Hilfe & Nachhilfe', life: 'Campusleben' };
 export const CATEGORIES = ['Alle','Outdoor','Sport','Food','Kultur','Lernen','Campus'];
 export function validEmail(value) { const email = String(value || '').trim().toLowerCase(); return /^[a-z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-z0-9.-]+$/.test(email) && VALID_DOMAINS.has(email.split('@')[1]); }
 export function escapeHtml(value = '') { return String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
@@ -14,6 +14,8 @@ export function filterPosts(posts, { tab = 'feed', filter = 'Alle', query = '', 
     if (tab === 'trade' && !['trade','food','help'].includes(p.type)) return false;
     if (tab === 'activities' && activityTab === 'Meine Pläne' && !joined.includes(p.id) && p.author_id !== userId) return false;
     if (tab === 'saved' && !saved.includes(p.id)) return false;
+    if (filter === 'Verkaufen') return p.type === 'trade' && Number(p.price)>0 && (!q || [p.title,p.description,p.location,p.author?.name].join(' ').toLowerCase().includes(q));
+    if (filter === 'Verschenken' && (p.type !== 'trade' || Number(p.price)>0)) return false;
     const mappings = {'Aktivitäten':'activity','Verschenken':'trade','Essen':'food','Hilfe':'help','Campusleben':'life'};
     if (filter !== 'Alle' && filter !== 'Für dich' && (mappings[filter] ? p.type !== mappings[filter] : p.category !== filter)) return false;
     return !q || [p.title,p.description,p.location,p.author?.name,p.category,TYPES[p.type]].join(' ').toLocaleLowerCase('de').includes(q);

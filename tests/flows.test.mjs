@@ -7,7 +7,7 @@ async function app() {
  const elements=new Map();const storage=new Map();const listeners={};
  function element(key){if(!elements.has(key))elements.set(key,{innerHTML:'',textContent:'',isConnected:true,classList:{add(){},remove(){}},focus(){},querySelector(){return {focus(){}}},querySelectorAll(){return []}});return elements.get(key);}
  const ctx=vm.createContext({console,Date,Intl,Set,Map,URL,URLSearchParams,Blob,AbortSignal,crypto:webcrypto,setTimeout:()=>0,clearTimeout(){},setInterval:()=>0,clearInterval(){},localStorage:{getItem:k=>storage.get(k)||null,setItem:(k,v)=>storage.set(k,v),removeItem:k=>storage.delete(k)},location:{hash:'',pathname:'/',href:'https://example.com/',protocol:'https:'},history:{replaceState(){}},navigator:{},document:{querySelector:element,addEventListener:(name,fn)=>listeners[name]=fn,body:{classList:{add(){},remove(){}}},activeElement:null},window:{FHV_CONFIG:{},addEventListener(){},scrollTo(){}},fetch:()=>{throw new Error('Unexpected network call in demo');}});
- let code='';for(const file of ['core','data','demo','icons','api','app']){let part=await readFile(`src/${file}.js`,'utf8');part=part.replace(/^import .*;\n/gm,'').replace(/^export /gm,'').replaceAll('import.meta.url',"'https://example.com/src/app.js'");if(file==='app')part='const e=escapeHtml;\n'+part;code+=part+'\n';}
+ let code='';for(const file of ['core','data','demo','icons','api','franzi','app']){let part=await readFile(`src/${file}.js`,'utf8');part=part.replace(/^import .*;\n/gm,'').replace(/^export /gm,'').replaceAll('import.meta.url',"'https://example.com/src/app.js'");if(file==='app')part='const e=escapeHtml;\n'+part;code+=part+'\n';}
  code+='globalThis.testApp = {state,render,navigate,detail,createModal,actions,joinActivity,respondInvite,toggleSave,toggleLike,contact,groupChat,persist,switchAccount,testAccounts,demoWorld};';
  vm.runInContext(code,ctx);return {ctx,a:ctx.testApp,elements,element,storage,listeners};
 }
@@ -66,4 +66,20 @@ test('profile pictures update every authored card without duplicating picture da
  assert.match(element('#app').innerHTML,/data:image\/jpeg;base64,YWJj/);
  assert.equal(JSON.parse(storage.get('fhv-demo-v2')).posts.some(p=>p.author),false);
  a.switchAccount('demo-profile-2');a.switchAccount('demo-you');assert.equal(a.state.user.avatar_data,'data:image/jpeg;base64,YWJj');
+});
+
+test('selling and gifts are separate and selling is searchable',async()=>{
+ const {a,element}=await app();a.navigate('trade');a.actions.filter({dataset:{value:'Verkaufen'}});let html=element('#app').innerHTML;assert.match(html,/Skier/);assert.doesNotMatch(html,/Schreibtischlampe/);
+ a.actions.filter({dataset:{value:'Verschenken'}});html=element('#app').innerHTML;assert.match(html,/Schreibtischlampe/);assert.doesNotMatch(html,/Skier, 170/);
+});
+test('connections require the recipient to accept and direct messages work without a post',async()=>{
+ const {a,element}=await app();await a.actions.people();assert.match(element('#overlay').innerHTML,/Profil 2/);
+ await a.actions.connect({dataset:{id:'demo-profile-2'}});assert.equal(a.demoWorld.connections[0].status,'pending');
+ a.switchAccount('demo-profile-3');await a.actions['connect-accept']({dataset:{id:'demo-you'}});assert.equal(a.demoWorld.connections[0].status,'pending');
+ a.switchAccount('demo-profile-2');await a.actions['connect-accept']({dataset:{id:'demo-you'}});assert.equal(a.demoWorld.connections[0].status,'accepted');
+ await a.actions['message-person']({dataset:{id:'demo-you'}});await a.actions['message-person']({dataset:{id:'demo-you'}});assert.equal(a.state.chats.length,1);
+ await a.actions.disconnect({dataset:{id:'demo-you'}});assert.equal(a.demoWorld.connections.length,0);
+});
+test('Franzi opens without downloading a model and identifies campus-only mode',async()=>{
+ const {a,element}=await app();a.actions.franzi();const html=element('#overlay').innerHTML;assert.match(html,/Franzi/);assert.match(html,/Lokale KI aktivieren/);assert.match(html,/Ohne KI/);
 });

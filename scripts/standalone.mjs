@@ -2,7 +2,7 @@ import { readFile, writeFile } from 'node:fs/promises';
 let html = await readFile('index.html','utf8');
 const css = await readFile('src/styles.css','utf8');
 let code='';
-for (const file of ['core','data','demo','icons','api','app']) {
+for (const file of ['core','data','demo','icons','api','franzi','app']) {
  let part=await readFile(`src/${file}.js`,'utf8');
  part=part.replace(/^import .*;\n/gm,'').replace(/^export /gm,'').replaceAll('import.meta.url','document.baseURI');
  if(file==='app')part='const e = escapeHtml;\n'+part;

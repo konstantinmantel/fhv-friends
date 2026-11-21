@@ -407,3 +407,44 @@ select { appearance: none; padding-right: 35px; background: white url("data:imag
   #toast { bottom: 95px; font-size: 13px; }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms!important; transition-duration: .01ms!important; scroll-behavior: auto!important; } }
+
+/* FHV palette, sampled from the official fhv.at design tokens. */
+:root { --fhv-blue:#97cff1; --fhv-yellow:#ffdc5f; --fhv-purple:#c0a9d2; --fhv-coral:#ee7551; --fhv-green:#bfe587; --blue:#dceffc; --accent:#24516c; --ink:#161615; }
+.logo-dot { color:var(--fhv-coral); }
+.side-link.active,.chip.selected,.nav-item.active .nav-icon { background:var(--fhv-blue); color:#161615; }
+.chip.selected { border-color:#7bbbe1; }
+.pinned-post { background:#fff8df; border-color:#f2dc8b; border-left:4px solid var(--fhv-yellow); }
+.pinned-label,.pinned-post>p,.pinned-bottom>span { color:#5a512f; }
+.type-label { border-radius:5px; padding:3px 7px; color:#272621; }
+.type-label.blue,.avatar.blue { background:#dceffc; }
+.type-label.lavender,.avatar.lavender { background:#ece2f2; }
+.type-label.green,.avatar.green { background:#e5f2d3; }
+.type-label.yellow,.avatar.yellow { background:#fff0b5; }
+.type-label.coral { background:#fce4dc; }
+.price-label { color:#41384b; font-weight:600; }
+.btn.soft { background:#dceffc; color:#254d65; }
+.profile-heading { border-top:5px solid var(--fhv-purple); padding-top:16px; }
+.person-avatar,.author-name { text-align:left; }
+.person-avatar { flex-shrink:0; display:flex; }
+.author-name:hover { text-decoration:underline; }
+.person-profile { text-align:center; display:grid; justify-items:center; gap:10px; padding:12px 0 24px; }
+.person-profile p { max-width:440px; }
+.person-actions { display:flex; justify-content:center; flex-wrap:wrap; gap:8px; }
+.people-tabs { display:flex; gap:8px; margin-bottom:20px; }
+.franzi-button { background:var(--fhv-purple); color:#161615; font-weight:700; font-size:19px; position:relative; }
+.franzi-button span { position:absolute; right:5px; bottom:5px; width:7px; height:7px; border-radius:50%; background:var(--fhv-yellow); }
+.franzi-intro { display:flex; gap:14px; align-items:center; margin-bottom:18px; }
+.franzi-intro p { font-size:13px; color:var(--muted); margin-top:3px; }
+.franzi-avatar { background:var(--fhv-purple); width:48px; height:48px; display:grid; place-items:center; font-size:27px; font-weight:700; border-radius:14px; }
+.franzi-setup { border:1px solid var(--line); padding:14px; border-radius:10px; margin-bottom:18px; }
+.franzi-setup p,.franzi-setup small { font-size:13px; line-height:1.5; display:block; margin-bottom:10px; }
+.franzi-setup small { margin:8px 0 0; overflow-wrap:anywhere; }
+.franzi-messages { max-height:40vh; overflow:auto; display:flex; flex-direction:column; gap:12px; padding-bottom:15px; }
+.franzi-message { padding:12px 14px; background:#f3edf7; border-radius:12px; max-width:92%; }
+.franzi-message.user { align-self:flex-end; background:#dceffc; }
+.franzi-message strong { font-size:12px; }
+.franzi-message p { white-space:pre-wrap; overflow-wrap:anywhere; margin-top:5px; line-height:1.5; font-size:15px; }
+.message-compose { display:flex; gap:8px; }
+.message-compose input { flex:1; min-width:0; }
+.sr-only { position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0; }
+@media(max-width:760px){.header-actions {gap:6px}.person-actions .btn {flex:1}.franzi-messages{max-height:36vh}}
