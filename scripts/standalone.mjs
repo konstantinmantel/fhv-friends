@@ -2,6 +2,7 @@ import { readFile, writeFile } from 'node:fs/promises';
 let html = await readFile('index.html','utf8');
 const css = await readFile('src/styles.css','utf8');
 const sprite=await readFile('public/ui-icons.svg','utf8');
+const handFiles=['01_spirale.png','02_glocke.png','03_austausch_pfeile.png','04_plus_quadrat.png','05_kalender.png','06_profil.png'];
 let code='';
 for (const file of ['core','data','demo','icons','api','franzi','app']) {
  let part=await readFile(`src/${file}.js`,'utf8');
@@ -9,6 +10,7 @@ for (const file of ['core','data','demo','icons','api','franzi','app']) {
  if(file==='app')part='const e = escapeHtml;\n'+part;
  code+=part+'\n';
 }
+for(const file of handFiles){const data=(await readFile(`public/icons/${file}`)).toString('base64');code=code.replaceAll(`./icons/${file}`,`data:image/png;base64,${data}`);}
 code=code.replaceAll('./ui-icons.svg#','#');
 html=html.replace('<body>',`<body><div hidden>${sprite}</div>`);
 html=html.replace('<link rel="stylesheet" href="./src/styles.css">',`<style>${css}</style>`)

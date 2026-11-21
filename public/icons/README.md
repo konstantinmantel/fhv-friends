@@ -1,0 +1,1 @@
+Original hand-drawn icons supplied by the FHV Friends team. The six PNG files are unchanged. The UI uses their alpha channels as CSS masks so the same drawing works on light and dark backgrounds. Feed, contacts and messenger are matching SVG additions in public/ui-icons.svg.

@@ -39,7 +39,11 @@ const paths = {
  leaf:'<path d="M20 3c-17-1-19 12-11 15 9 4 13-7 11-15ZM4 22 16 9"/>',
 };
 const brandSymbols={"home":"feed","trade":"arrows","calendar":"calendar","user":"person","bell":"bell","chat":"chat","franzi":"franzi","people":"people","plus":"plus","search":"search","car":"car","book":"book","heart":"heart","bookmark":"bookmark","map":"map"};
-export function icon(name,size=22,cls=''){
+const handAssets={franzi:'./icons/01_spirale.png',bell:'./icons/02_glocke.png',trade:'./icons/03_austausch_pfeile.png',calendar:'./icons/05_kalender.png',user:'./icons/06_profil.png'};
+export function icon(name,size=22,cls='') {
+ const file=handAssets[name]||(name==='plus'&&cls==='create-mark'?'./icons/04_plus_quadrat.png':null);
+ const assetUrl=file?new URL(file,document.baseURI||location.href).href:null;
+ if(file)return `<span class="icon hand-icon ${cls}" style="width:${size}px;height:${size}px;--hand-icon:url('${assetUrl}')" aria-hidden="true"></span>`;
  const symbol=brandSymbols[name];
  return `<svg class="icon ${symbol?'brand-icon ':''}${cls}" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${symbol?'1.9':'1.7'}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${symbol?`<use href="./ui-icons.svg#${symbol}"/>`:paths[name]||paths.spark}</svg>`;
 }
