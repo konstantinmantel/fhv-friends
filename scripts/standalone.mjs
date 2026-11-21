@@ -1,6 +1,7 @@
 import { readFile, writeFile } from 'node:fs/promises';
 let html = await readFile('index.html','utf8');
 const css = await readFile('src/styles.css','utf8');
+const sprite=await readFile('public/ui-icons.svg','utf8');
 let code='';
 for (const file of ['core','data','demo','icons','api','franzi','app']) {
  let part=await readFile(`src/${file}.js`,'utf8');
@@ -8,6 +9,8 @@ for (const file of ['core','data','demo','icons','api','franzi','app']) {
  if(file==='app')part='const e = escapeHtml;\n'+part;
  code+=part+'\n';
 }
+code=code.replaceAll('./ui-icons.svg#','#');
+html=html.replace('<body>',`<body><div hidden>${sprite}</div>`);
 html=html.replace('<link rel="stylesheet" href="./src/styles.css">',`<style>${css}</style>`)
  .replace(/  <link rel="manifest"[^>]*>\n/,'').replace(/  <link rel="icon"[^>]*>\n/,'').replace(/  <link rel="apple-touch-icon"[^>]*>\n/,'')
  .replace('<script src="./config.js"></script>','<script>window.FHV_CONFIG = {supabaseUrl:"",supabaseKey:""};</script>')

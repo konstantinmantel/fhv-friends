@@ -38,4 +38,8 @@ const paths = {
  wifi:'<path d="M2 7a16 16 0 0 1 20 0M5 11a11 11 0 0 1 14 0M8 15a6 6 0 0 1 8 0M12 20h.01"/>',
  leaf:'<path d="M20 3c-17-1-19 12-11 15 9 4 13-7 11-15ZM4 22 16 9"/>',
 };
-export function icon(name,size=22,cls='') { return `<svg class="icon ${cls}" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths[name] || paths.spark}</svg>`; }
+const brandSymbols={"home":"feed","trade":"arrows","calendar":"calendar","user":"person","bell":"bell","chat":"chat","franzi":"franzi","people":"people","plus":"plus","search":"search","car":"car","book":"book","heart":"heart","bookmark":"bookmark","map":"map"};
+export function icon(name,size=22,cls=''){
+ const symbol=brandSymbols[name];
+ return `<svg class="icon ${symbol?'brand-icon ':''}${cls}" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${symbol?'1.9':'1.7'}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${symbol?`<use href="./ui-icons.svg#${symbol}"/>`:paths[name]||paths.spark}</svg>`;
+}
