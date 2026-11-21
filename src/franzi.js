@@ -8,7 +8,7 @@ export async function startFranziAI(progress=()=>{}){
  progress('Lade KI-Bibliothek …');
  const {CreateMLCEngine}=await import('https://esm.run/@mlc-ai/web-llm@0.2.89');
  const half=adapter.features.has('shader-f16');
- franziEngine=await CreateMLCEngine(`Qwen3-0.6B-q4${half?'f16':'f32'}_1-MLC`,{initProgressCallback:r=>progress(r.text||`${Math.round(r.progress*100)} %`)},{context_window_size:4096});
+ franziEngine=await CreateMLCEngine(`Qwen3-1.7B-q4${half?'f16':'f32'}_1-MLC`,{initProgressCallback:r=>progress(r.text||`${Math.round(r.progress*100)} %`)},{context_window_size:4096});
 }
 export async function franziAnswer(history,posts=[]){
  if(!franziEngine)throw new Error('KI noch nicht aktiviert.');
