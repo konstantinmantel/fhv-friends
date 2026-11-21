@@ -21,3 +21,14 @@ test('only size-bounded raster data URLs are accepted as uploaded photos',()=>{
  assert.ok(safeImage('data:image/jpeg;base64,YWJj'));
  for(const value of ['javascript:alert(1)','data:image/svg+xml;base64,YWJj','https://example.com/a.jpg','data:text/html;base64,YWJj','data:image/png;base64,abc\" onerror=\"bad','data:image/jpeg;base64,'+'a'.repeat(220000)])assert.equal(safeImage(value),'');
 });
+test('English fixture migration preserves edited posts, photos and profile names',()=>{
+ const w=createDemoWorld();delete w.presentationEnglishV1;
+ w.profiles[0].name='Konstantin';w.profiles[1].name='Profil 2';
+ Object.assign(w.posts.find(p=>p.id==='hike'),{title:'Samstag auf den Karren?',category:'Mitfahren',image_data:'data:image/jpeg;base64,YWJj'});
+ Object.assign(w.posts.find(p=>p.id==='lamp'),{title:'My own title',description:'Mein eigener Text'});
+ const next=createDemoWorld(w);
+ assert.equal(next.profiles[0].name,'Konstantin');assert.equal(next.profiles[1].name,'Maya');
+ assert.equal(next.posts.find(p=>p.id==='hike').title,'Karren hike on Saturday?');
+ assert.equal(next.posts.find(p=>p.id==='hike').image_data,'data:image/jpeg;base64,YWJj');
+ assert.equal(next.posts.find(p=>p.id==='lamp').description,'Mein eigener Text');
+});

@@ -460,3 +460,32 @@ select { appearance: none; padding-right: 35px; background: white url("data:imag
 .franzi-intro .franzi-avatar{border-radius:12px;position:relative}
 .franzi-intro .franzi-avatar::after{content:'';position:absolute;width:8px;height:8px;bottom:6px;right:6px;border-radius:50%;background:var(--fhv-yellow)}
 @media(max-width:760px){.bottom-nav .nav-create .nav-icon{background:transparent;color:var(--ink);width:49px;height:49px;border-radius:0}.bottom-nav .nav-create .create-mark{width:47px!important;height:47px!important}.header-actions>.franzi-button{width:40px;height:40px;border-radius:10px}.header-actions .franzi-button .hand-icon{width:27px!important;height:27px!important}.header-actions .franzi-dot{width:7px;height:7px;right:4px;bottom:4px}}
+
+/* Presentation polish: quiet settings, stronger mobile hierarchy. */
+.menu-section{margin-top:28px}.menu-section>h2{font-size:13px;font-weight:650;text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;color:var(--muted)}
+.profile-menu button>.icon{flex:0 0 22px;width:22px!important;height:22px!important;min-width:22px;align-self:center}
+.profile-menu button>.menu-copy{flex:1;min-width:0}.profile-menu button>.menu-copy strong{font-size:15px}.profile-menu button{min-height:65px;padding:17px 20px;gap:15px}
+.profile-menu button>.icon:last-child{flex:0 0 17px;width:17px!important;height:17px!important;min-width:17px}
+.profile-stats span{font-size:13px}.ride-offer{font-size:14px;font-weight:600;text-decoration:underline;text-underline-offset:4px}
+@media(max-width:760px){
+ .content-layout{padding-top:0;padding-bottom:110px}
+ .page-header{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:0 12px;background:var(--ink);color:#fff;margin:0 -20px 20px;padding:18px 20px 20px;border:0}
+ .mobile-brand{display:block;grid-column:1;grid-row:1;margin:0;align-self:center}
+ .mobile-brand .logo-name{font-size:28px}.mobile-brand .logo-name svg{width:22px;height:22px}.mobile-brand .logo-eyebrow{font-size:9px}
+ .header-main{display:contents}.page-title{grid-column:1/-1;grid-row:2;margin-top:24px}.page-eyebrow{display:none}
+ .header-main h1,.page-feed .header-main h1{font-size:31px;line-height:1.08;letter-spacing:-.045em}
+ .header-actions{grid-column:2;grid-row:1;align-self:center;gap:4px;padding:0}
+ .header-actions>.icon-btn:not(.franzi-button){color:#fff;background:transparent;width:34px;height:38px}
+ .header-actions>.franzi-button{color:var(--ink);width:38px;height:38px;border-radius:10px;margin-right:3px}
+ .header-actions .franzi-button .hand-icon{width:25px!important;height:25px!important}.header-actions .franzi-dot{width:6px;height:6px}
+ .search-box{min-height:43px}.search-box kbd{display:none}.chips{padding-bottom:14px}.chip{padding-top:11px;padding-bottom:8px;font-size:13px}
+ .pinned-post{grid-template-columns:minmax(0,1fr) 86px}.pinned-feature{padding:17px}.pinned-label{margin-bottom:18px}.pinned-post h2{font-size:26px}.feature-date strong{font-size:58px}.feature-date>span:last-child{margin-top:11px}
+ .pinned-bottom{margin-top:21px}.pinned-bottom>span{font-size:12px}.pinned-bottom .btn{min-height:33px}
+ .bottom-nav{background:var(--ink);border-color:var(--ink);left:10px;right:10px;height:70px;box-shadow:0 5px 22px #0002;border-radius:15px}
+ .nav-item{color:#c7cbbf}.nav-item.active{color:#fff}.nav-item.active .nav-icon{color:var(--ink);background:var(--fhv-blue)}
+ .nav-icon{height:30px;width:40px}.nav-label{font-size:10px}.bottom-nav .nav-create .nav-icon{color:var(--fhv-yellow);background:transparent}.bottom-nav .nav-create .create-mark{width:43px!important;height:43px!important}
+ .profile-card{border-top-width:8px}.profile-content{padding:21px}.profile-content h2{font-size:30px}.profile-heading{margin-bottom:17px}.profile-heading .avatar.large{width:66px;height:66px}
+ .profile-stats{padding-top:16px}.profile-stats strong{font-size:24px}.menu-section{margin-top:24px}.profile-menu button{min-height:61px;padding:16px;gap:13px}
+ .person-actions{gap:8px}.person-actions .btn{min-width:0;font-size:13px}.modal{max-height:92dvh}.franzi-setup p{font-size:13px}
+}
+@media(max-width:360px){.page-header{margin-left:-15px;margin-right:-15px;padding-left:15px;padding-right:15px}.header-main h1,.page-feed .header-main h1{font-size:29px}.header-actions>.icon-btn:not(.franzi-button){width:29px}}

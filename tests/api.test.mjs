@@ -12,8 +12,18 @@ test('login sends normalized email and stores access token for authenticated req
 });
 test('membership changes use the capacity-enforcing RPC',async()=>{await api.rpc('set_attendance',{activity_id:'event',attending:true});const call=calls.at(-1);assert.match(call.url,/\/rpc\/set_attendance$/);assert.deepEqual(JSON.parse(call.options.body),{activity_id:'event',attending:true});});
 test('editing a contribution cannot change its immutable type or author',async()=>{
- await api.updatePost('abc',{type:'activity',title:'Neuer Titel'});const call=calls.at(-1);assert.equal(call.options.method,'PATCH');assert.deepEqual(JSON.parse(call.options.body),{title:'Neuer Titel'});
+ await api.updatePost('abc',{type:'activity',title:'Neuer Title'});const call=calls.at(-1);assert.equal(call.options.method,'PATCH');assert.deepEqual(JSON.parse(call.options.body),{title:'Neuer Title'});
 });
 test('email delivery restrictions are shown as a clear configuration issue',async()=>{
- const prev=globalThis.fetch;globalThis.fetch=async()=>new Response(JSON.stringify({error_code:'email_address_not_authorized'}),{status:400});await assert.rejects(()=>api.signup('student@students.fhv.at','longpassword123','Name'),/Mailversand/);globalThis.fetch=prev;
+ const prev=globalThis.fetch;globalThis.fetch=async()=>new Response(JSON.stringify({error_code:'email_address_not_authorized'}),{status:400});await assert.rejects(()=>api.signup('student@students.fhv.at','longpassword123','Name'),/email delivery/);globalThis.fetch=prev;
+});
+test('English categories round-trip through the existing database vocabulary',async()=>{
+ const previous=globalThis.fetch;
+ globalThis.fetch=async(url,options)=>{calls.push({url,options});return new Response(JSON.stringify([{id:'ride',category:'Mitfahren'}]),{status:200});};
+ try{
+  assert.equal((await api.posts())[0].category,'Rides');
+  assert.equal((await api.createPost({type:'activity',category:'Rides'}))[0].category,'Rides');
+  assert.equal(JSON.parse(calls.at(-1).options.body).category,'Mitfahren');
+  await api.updatePost('ride',{category:'Culture'});assert.equal(JSON.parse(calls.at(-1).options.body).category,'Kultur');
+ }finally{globalThis.fetch=previous;}
 });

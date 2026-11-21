@@ -11,11 +11,11 @@ async function app() {
  code+='globalThis.testApp = {state,render,navigate,detail,createModal,actions,joinActivity,respondInvite,toggleSave,toggleLike,contact,groupChat,persist,switchAccount,testAccounts,demoWorld};';
  vm.runInContext(code,ctx);return {ctx,a:ctx.testApp,elements,element,storage,listeners};
 }
-test('initial app renders all four tabs, correct brand and explicit demo state',async()=>{
- const {a,element}=await app();let html=element('#app').innerHTML;assert.match(html,/FHV/);assert.match(html,/riends/);assert.match(html,/Demo · nur auf diesem Gerät/);for(const x of ['Home \/ Feed','Trade \/ Help','Activities','Profile'])assert.ok(html.includes(x));
- a.navigate('trade');html=element('#app').innerHTML;assert.match(html,/Nachhilfe|Hilfe/);assert.match(html,/Campus-Spots/);assert.doesNotMatch(html,/Kopf aus\. Karren rauf\.<\/h3>/);
- a.navigate('activities');html=element('#app').innerHTML;assert.match(html,/Meine Pläne/);assert.doesNotMatch(html,/Ein Salat zu viel/);
- a.navigate('profile');assert.match(element('#app').innerHTML,/Profil bearbeiten/);
+test('initial app renders English navigation without presentation clutter',async()=>{
+ const {a,element}=await app();let html=element('#app').innerHTML;assert.match(html,/FHV/);assert.match(html,/riends/);assert.match(html,/Search campus/);assert.doesNotMatch(html,/Demo ·|campus-actions|example-label/);assert.match(html,/ui-icons.svg#fhv/);assert.match(html,/ui-icons.svg#envelope/);for(const x of ['Feed','Trade \/ Help','Activities','Profile'])assert.ok(html.includes(x));
+ a.navigate('trade');html=element('#app').innerHTML;assert.match(html,/Help/);assert.match(html,/Campus spots/);assert.doesNotMatch(html,/Karren hike on Saturday\?<\/h3>/);
+ a.navigate('activities');html=element('#app').innerHTML;assert.match(html,/My plans/);assert.doesNotMatch(html,/Spare couscous salad/);
+ a.navigate('profile');assert.match(element('#app').innerHTML,/Edit profile/);assert.match(element('#app').innerHTML,/Your campus/);assert.match(element('#app').innerHTML,/system-icon/);await a.actions.about();assert.match(element('#overlay').innerHTML,/not shared with other devices/);
 });
 test('RSVP join and leave update counts and capacity without oversubscription',async()=>{
  const {a}=await app();const post=a.state.posts.find(p=>p.id==='run');const original=post.join_count;
@@ -32,24 +32,24 @@ test('accepting an invitation is idempotent and updates personal plans',async()=
 test('bookmarks and likes toggle and persist; details render without template errors',async()=>{
  const {a,element,storage}=await app();await a.toggleSave('salad');assert.ok(a.state.saved.includes('salad'));assert.ok(storage.has('fhv-demo-v2'));
  await a.toggleSave('salad');assert.equal(a.state.saved.length,0);await a.toggleLike('salad');assert.ok(a.state.liked.includes('salad'));
- await a.detail('coffee');assert.match(element('#overlay').innerHTML,/Spieleabend im Café Campus/);assert.doesNotMatch(element('#overlay').innerHTML,/\$\{FREE\}/);
- await a.detail('salad');assert.match(element('#overlay').innerHTML,/Allergene/);
+ await a.detail('coffee');assert.match(element('#overlay').innerHTML,/Board games at Café Campus/);assert.doesNotMatch(element('#overlay').innerHTML,/\$\{FREE\}/);
+ await a.detail('salad');assert.match(element('#overlay').innerHTML,/allergens/);
 });
 test('direct and group chats create one conversation and never fake incoming messages',async()=>{
  const {a,element}=await app();await a.contact('salad');assert.doesNotMatch(element('#overlay').innerHTML,/&lt;button class/);await a.contact('salad');assert.equal(a.state.chats.length,1);assert.equal(a.state.messages[a.state.chats[0].id].length,0);
  await a.joinActivity('hike');await a.groupChat('hike');assert.equal(a.state.chats.length,2);assert.equal(a.state.chats[1].post_id,'hike');
 });
 test('create and edit forms render safe text and the help category in the right place',async()=>{
- const {a,element}=await app();a.createModal('help');assert.match(element('#overlay').innerHTML,/Hilfe anbieten/);assert.doesNotMatch(element('#overlay').innerHTML,/name="date"/);
+ const {a,element}=await app();a.createModal('help');assert.match(element('#overlay').innerHTML,/Offer help/);assert.doesNotMatch(element('#overlay').innerHTML,/name="date"/);
  a.createModal('activity');assert.match(element('#overlay').innerHTML,/name="date"/);
- const p=a.state.posts.find(x=>x.id==='tool');p.title='<img onerror=x>';a.createModal('help','tool');assert.match(element('#overlay').innerHTML,/&lt;img onerror=x&gt;/);assert.match(element('#overlay').innerHTML,/Änderungen speichern/);
+ const p=a.state.posts.find(x=>x.id==='tool');p.title='<img onerror=x>';a.createModal('help','tool');assert.match(element('#overlay').innerHTML,/&lt;img onerror=x&gt;/);assert.match(element('#overlay').innerHTML,/Save changes/);
 });
 
 test('four editable test profiles keep RSVPs and bookmarks separate',async()=>{
  const {a,storage}=await app();assert.equal(a.demoWorld.profiles.length,4);
  await a.joinActivity('run');await a.toggleSave('salad');
  a.state.user.name='Mara';a.state.user.bio='Bouldern und Kaffee';a.persist();
- a.switchAccount('demo-profile-2');assert.equal(a.state.user.name,'Profil 2');assert.equal(a.state.joined.length,0);assert.equal(a.state.saved.length,0);
+ a.switchAccount('demo-profile-2');assert.equal(a.state.user.name,'Maya');assert.equal(a.state.joined.length,0);assert.equal(a.state.saved.length,0);
  await a.joinActivity('run');assert.equal(a.state.posts.find(p=>p.id==='run').join_count,2);
  a.switchAccount('demo-you');assert.equal(a.state.user.name,'Mara');assert.deepEqual(Array.from(a.state.saved),['salad']);assert.ok(a.state.joined.includes('run'));
  const saved=JSON.parse(storage.get('fhv-demo-v2'));assert.equal(saved.accounts['demo-profile-2'].joined.length,1);
@@ -69,11 +69,11 @@ test('profile pictures update every authored card without duplicating picture da
 });
 
 test('selling and gifts are separate and selling is searchable',async()=>{
- const {a,element}=await app();a.navigate('trade');a.actions.filter({dataset:{value:'Verkaufen'}});let html=element('#app').innerHTML;assert.match(html,/Skier/);assert.doesNotMatch(html,/Schreibtischlampe/);
- a.actions.filter({dataset:{value:'Verschenken'}});html=element('#app').innerHTML;assert.match(html,/Schreibtischlampe/);assert.doesNotMatch(html,/Skier, 170/);
+ const {a,element}=await app();a.navigate('trade');a.actions.filter({dataset:{value:'For sale'}});let html=element('#app').innerHTML;assert.match(html,/170 cm skis/);assert.doesNotMatch(html,/Desk lamp/);
+ a.actions.filter({dataset:{value:'Free stuff'}});html=element('#app').innerHTML;assert.match(html,/Desk lamp/);assert.doesNotMatch(html,/170 cm skis/);
 });
 test('connections require the recipient to accept and direct messages work without a post',async()=>{
- const {a,element}=await app();await a.actions.people();assert.match(element('#overlay').innerHTML,/Profil 2/);
+ const {a,element}=await app();await a.actions.people();assert.match(element('#overlay').innerHTML,/Maya/);
  await a.actions.connect({dataset:{id:'demo-profile-2'}});assert.equal(a.demoWorld.connections[0].status,'pending');
  a.switchAccount('demo-profile-3');await a.actions['connect-accept']({dataset:{id:'demo-you'}});assert.equal(a.demoWorld.connections[0].status,'pending');
  a.switchAccount('demo-profile-2');await a.actions['connect-accept']({dataset:{id:'demo-you'}});assert.equal(a.demoWorld.connections[0].status,'accepted');
@@ -81,11 +81,11 @@ test('connections require the recipient to accept and direct messages work witho
  await a.actions.disconnect({dataset:{id:'demo-you'}});assert.equal(a.demoWorld.connections.length,0);
 });
 test('Franzi opens without downloading a model and identifies campus-only mode',async()=>{
- const {a,element}=await app();a.actions.franzi();const html=element('#overlay').innerHTML;assert.match(html,/Franzi/);assert.match(html,/Lokale KI aktivieren/);assert.match(html,/Ohne KI/);
+ const {a,element}=await app();a.actions.franzi();const html=element('#overlay').innerHTML;assert.match(html,/Franzi/);assert.match(html,/Enable local AI/);assert.match(html,/Campus help works/);
 });
 
 test('Beerpong, Glühwein and carpool offers are included and rides have their own form',async()=>{
  const {a,element}=await app();for(const id of ['beerpong','gluehwein','ride-bregenz'])assert.ok(a.state.posts.some(p=>p.id===id));
- a.createModal('activity',null,true);let html=element('#overlay').innerHTML;assert.match(html,/name="ride_destination"/);assert.match(html,/Freie Plätze/);assert.match(html,/Mitfahren/);
- await a.detail('ride-bregenz');html=element('#overlay').innerHTML;assert.match(html,/Bregenz Bahnhof/);assert.match(html,/3 Plätze frei/);
+ a.createModal('activity',null,true);let html=element('#overlay').innerHTML;assert.match(html,/name="ride_destination"/);assert.match(html,/Available seats/);assert.match(html,/Rides/);
+ await a.detail('ride-bregenz');html=element('#overlay').innerHTML;assert.match(html,/Bregenz station/);assert.match(html,/3 seats available/);
 });

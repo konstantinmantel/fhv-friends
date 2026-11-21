@@ -9,16 +9,16 @@ test('only exact FHV email domains are allowed, with normalized casing',()=>{
 });
 test('untrusted titles and chat text are escaped',()=>{assert.equal(escapeHtml('<img src=x onerror="alert(1)"> & \'hi\''),'&lt;img src=x onerror=&quot;alert(1)&quot;&gt; &amp; &#39;hi&#39;');});
 test('Activities contains activities only; help and tutoring remain under Trade / Help',()=>{
- const posts=[{id:'a',type:'activity',title:'Lerngruppe',category:'Lernen',created_at:future,starts_at:future},{id:'h',type:'help',title:'Nachhilfe',category:'Lernen',created_at:future},{id:'t',type:'trade',title:'Lampe',created_at:future},{id:'f',type:'food',title:'Salat',created_at:future}];
+ const posts=[{id:'a',type:'activity',title:'Lerngruppe',category:'Study',created_at:future,starts_at:future},{id:'h',type:'help',title:'Nachhilfe',category:'Study',created_at:future},{id:'t',type:'trade',title:'Lampe',created_at:future},{id:'f',type:'food',title:'Salat',created_at:future}];
  assert.deepEqual(filterPosts(posts,{tab:'activities'}).map(p=>p.id),['a']);
- assert.deepEqual(filterPosts(posts,{tab:'trade',filter:'Hilfe'}).map(p=>p.id),['h']);
+ assert.deepEqual(filterPosts(posts,{tab:'trade',filter:'Help'}).map(p=>p.id),['h']);
  assert.deepEqual(filterPosts(posts,{tab:'trade'}).map(p=>p.id),['h','t','f']);
 });
 test('feed pinning, search, saved items and personal plans respect selection',()=>{
  const posts=[{id:'a',author_id:'me',type:'activity',title:'Bouldern',description:'K1 Dornbirn',created_at:'2026-11-20',starts_at:future},{id:'b',type:'activity',title:'Kaffee',created_at:'2026-11-19',starts_at:future,pinned:true},{id:'c',type:'help',title:'Nachhilfe',description:'MATLAB',created_at:'2026-11-21'}];
  assert.equal(filterPosts(posts)[0].id,'b');
  assert.deepEqual(filterPosts(posts,{query:'matlab'}).map(p=>p.id),['c']);
- assert.deepEqual(filterPosts(posts,{tab:'activities',activityTab:'Meine Pläne',userId:'me',joined:['b']}).map(p=>p.id),['a','b']);
+ assert.deepEqual(filterPosts(posts,{tab:'activities',activityTab:'My plans',userId:'me',joined:['b']}).map(p=>p.id),['a','b']);
  assert.deepEqual(filterPosts(posts,{tab:'saved',saved:['a']}).map(p=>p.id),['a']);
 });
 test('invalid and past activities, capacity and negative prices are rejected',()=>{
@@ -35,7 +35,7 @@ test('calendar uses UTC and escapes user supplied newlines and separators',()=>{
 test('profile initials work for names and empty profiles',()=>{assert.equal(initials('Lena Mantel'),'LM');assert.equal(initials('ÖH FHV'),'ÖF');});
 
 test('carpool offers validate route and available seats independently of ordinary events',()=>{
- const ride={...valid,category:'Mitfahren',ride_destination:'Bregenz Bahnhof',capacity:1};
+ const ride={...valid,category:'Rides',ride_destination:'Bregenz Bahnhof',capacity:1};
  assert.equal(validatePost(ride),null);
  for(const change of [{ride_destination:''},{capacity:0},{capacity:9},{type:'help'}])assert.equal(typeof validatePost({...ride,...change}),'string');
 });
