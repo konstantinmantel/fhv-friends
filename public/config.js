@@ -1,3 +1,2 @@
-// Public project URL and publishable/anon key only. NEVER add a service-role key.
-// Leave empty for the clearly labelled, device-local demo.
-window.FHV_CONFIG = Object.freeze({ supabaseUrl: '', supabaseKey: '' });
+// Public endpoint only. Room access keys stay in private room links.
+window.FHV_CONFIG = Object.freeze({supabaseUrl:'',supabaseKey:'',presentationApi:'https://fhv-friends-sync.appreciativemesa8.chatgpt.site'});
