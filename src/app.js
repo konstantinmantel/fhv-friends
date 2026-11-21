@@ -11,7 +11,7 @@ if(!demoWorld.profiles.some(p=>p.id===activeDemoId))activeDemoId=demoWorld.profi
 const demoAccount=demoWorld.accounts[activeDemoId]||emptyDemoAccount();
 const state = {mode:'demo',user:{...demoPerson(demoWorld,activeDemoId)},posts:hydrateDemoPosts(demoWorld),joined:demoAccount.joined,saved:demoAccount.saved,liked:demoAccount.liked,comments:demoWorld.comments,chats:demoWorld.chats,messages:demoWorld.messages,invitations:demoAccount.invitations,tab:['feed','trade','activities','profile'].includes(location.hash.slice(1))?location.hash.slice(1):'feed',filter:'All',query:'',activityTab:'Discover',overlay:null,selected:null,busy:false,loading:false,authMode:'login',createType:'activity',createCategory:'Campus',currentChat:null,noticeRead:false};
 let deferredInstall, chatInterval, lastFocus;
-const fhvMark = `<svg viewBox="0 0 460 460" fill="currentColor" aria-hidden="true"><path d="M10.8 346.8h337.5V234.3H10.8V121.7h337.6V9.1H461v450.2H10.9l-.1-112.5z"/></svg>`;
+const fhvMark = icon('home',29,'wordmark-f');
 const logo = `<span class="wordmark" role="img" aria-label="FHV Friends"><span class="logo-eyebrow">FHV</span><span class="logo-name">${fhvMark}<span>riends<span class="logo-dot">.</span></span></span></span>`;
 const avatar = (person,size='') => `<span class="avatar ${person?.color||'blue'} ${size}" aria-hidden="true">${safeImage(person?.avatar_data)?`<img src="${e(safeImage(person.avatar_data))}" alt="">`:person?.role==='oh'?'ÖH':e(initials(person?.name))}</span>`;
 const isOh = () => ['oh','admin'].includes(state.user?.role);
