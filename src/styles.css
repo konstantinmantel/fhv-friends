@@ -446,3 +446,6 @@ select { appearance: none; padding-right: 35px; background: white url("data:imag
 .profile-content{padding:22px}.profile-content h2{font-size:33px}.profile-stats strong{font-size:25px}.person-actions .btn{flex:1}.franzi-messages{max-height:36vh}.franzi-intro{gap:12px}#toast{bottom:105px}
 }
 @media(max-width:360px){.content-layout{padding-left:15px;padding-right:15px}.header-main h1{font-size:30px}.page-feed .header-main h1{font-size:43px}.header-actions>.icon-btn{width:33px;height:33px}.header-actions{gap:4px}.event-poster h3{font-size:38px}.pinned-post{grid-template-columns:minmax(0,1fr) 82px}.pinned-post h2{font-size:24px}}
+
+/* Profile and saved-post dialogs keep cards readable at dialog widths. */
+.modal .post-grid{grid-template-columns:1fr}.modal .event-poster{min-height:220px}
