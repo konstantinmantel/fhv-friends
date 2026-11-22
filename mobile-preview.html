@@ -51,7 +51,7 @@
     const shell=document.querySelector('#shell');
     const stage=document.querySelector('#stage');
     function fit(){
-      const scale=Math.min(1,(innerWidth-52)/423,(innerHeight-120)/882);
+      const scale=Math.min(1,(innerWidth-52)/423,(stage.clientHeight-24)/882);
       stage.style.setProperty('--scale',Math.max(.42,scale));
     }
     addEventListener('resize',fit);
