@@ -10,7 +10,8 @@ import { api, configured } from './api.js';
 import { escapeHtml as e, safeImage, initials, dateLabel, timeLabel, relative, filterPosts, validatePost, makeICS, readLocal, saveLocal, TYPES, CATEGORIES } from './core.js';
 const $ = s => document.querySelector(s);
 const demoWorld=createDemoWorld(readLocal('fhv-demo-v2',null),readLocal('fhv-demo-v1',null));
-let activeDemoId;try{activeDemoId=sessionStorage.getItem('fhv-demo-active')||localStorage.getItem('fhv-demo-active');}catch{}
+let activeDemoId;try{activeDemoId=localStorage.getItem('fhv-demo-active');}catch{}
+try{activeDemoId=sessionStorage.getItem('fhv-demo-active')||activeDemoId;}catch{}
 if(!demoWorld.profiles.some(p=>p.id===activeDemoId))activeDemoId=demoWorld.profiles[0].id;
 const demoAccount=demoWorld.accounts[activeDemoId]||emptyDemoAccount();
 const state = {mode:'demo',user:{...demoPerson(demoWorld,activeDemoId)},posts:hydrateDemoPosts(demoWorld),joined:demoAccount.joined,saved:demoAccount.saved,liked:demoAccount.liked,comments:demoWorld.comments,chats:demoWorld.chats,messages:demoWorld.messages,invitations:demoAccount.invitations,tab:['feed','trade','activities','profile'].includes(location.hash.slice(1))?location.hash.slice(1):'feed',filter:'All',query:'',activityTab:'Discover',overlay:null,selected:null,busy:false,loading:false,authMode:'login',createType:'activity',createCategory:'Campus',currentChat:null,noticeRead:false};
@@ -191,7 +192,8 @@ function switchAccount(id){
  if(!isDemo()||!demoWorld.profiles.some(p=>p.id===id))return;
  persist();const account=demoWorld.accounts[id]||emptyDemoAccount();state.user={...demoPerson(demoWorld,id)};
  Object.assign(state,{joined:account.joined,saved:account.saved,liked:account.liked,invitations:account.invitations});
- state.posts=hydrateDemoPosts(demoWorld);try{sessionStorage.setItem('fhv-demo-active',id);localStorage.setItem('fhv-demo-active',id);}catch{}
+ state.posts=hydrateDemoPosts(demoWorld);try{localStorage.setItem('fhv-demo-active',id);}catch{}
+ try{sessionStorage.setItem('fhv-demo-active',id);}catch{}
  closeModal();render();toast(`${state.user.name} selected.`);
 }
 function chatTitle(chat){if(!chat)return 'Messages';if(!isDemo()||chat.post_id)return chat.title||'Group chat';const other=chat.members?.find(id=>id!==state.user.id);return other?demoPerson(demoWorld,other).name:chat.title||'Chat';}
