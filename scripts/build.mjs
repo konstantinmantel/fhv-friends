@@ -3,6 +3,7 @@ import { resolve } from 'node:path';
 await rm('dist', { recursive: true, force: true });
 await mkdir('dist', { recursive: true });
 await cp('index.html', 'dist/index.html');
+await cp('mobile-preview.html', 'dist/mobile-preview.html');
 await cp('src', 'dist/src', { recursive: true });
 await cp('public', 'dist', { recursive: true });
 if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
