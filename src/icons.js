@@ -46,5 +46,5 @@ export function icon(name,size=22,cls='') {
  const assetUrl=file?new URL(file,document.baseURI||location.href).href:null;
  if(file)return `<span class="icon hand-icon ${cls}" style="width:${size}px;height:${size}px;--hand-icon:url('${assetUrl}')" aria-hidden="true"></span>`;
  const symbol=brandSymbols[name];
- return `<svg class="icon ${symbol?'brand-icon ':''}${cls}" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${symbol?'1.9':'1.7'}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${symbol?`<use href="./ui-icons.svg#${symbol}"/>`:paths[name]||paths.spark}</svg>`;
+ return `<svg class="icon ${symbol?'brand-icon ':''}${cls}" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${symbol?'1.9':'1.7'}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${symbol?`<use href="#${symbol}"/>`:paths[name]||paths.spark}</svg>`;
 }

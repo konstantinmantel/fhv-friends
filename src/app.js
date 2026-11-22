@@ -1,3 +1,6 @@
+import {ICON_SPRITE} from './icon-sprite.js';
+import {updateDOM} from './dom.js';
+import {installGestures,swipeDestination} from './gestures.js';
 import {PresentationSync,createPresentation,roomToken} from './sync.js';
 import { franziAnswer, startFranziAI, franziReady, campusAnswer } from './franzi.js';
 import { icon } from './icons.js';
@@ -12,6 +15,7 @@ if(!demoWorld.profiles.some(p=>p.id===activeDemoId))activeDemoId=demoWorld.profi
 const demoAccount=demoWorld.accounts[activeDemoId]||emptyDemoAccount();
 const state = {mode:'demo',user:{...demoPerson(demoWorld,activeDemoId)},posts:hydrateDemoPosts(demoWorld),joined:demoAccount.joined,saved:demoAccount.saved,liked:demoAccount.liked,comments:demoWorld.comments,chats:demoWorld.chats,messages:demoWorld.messages,invitations:demoAccount.invitations,tab:['feed','trade','activities','profile'].includes(location.hash.slice(1))?location.hash.slice(1):'feed',filter:'All',query:'',activityTab:'Discover',overlay:null,selected:null,busy:false,loading:false,authMode:'login',createType:'activity',createCategory:'Campus',currentChat:null,noticeRead:false};
 let deferredInstall, chatInterval, lastFocus;
+let roomConnection=0;
 let sharedClient=null,sharedStatus='',sharedError='';
 const presentationEndpoint=window.FHV_CONFIG?.presentationApi||'';
 const linkedRoom=roomToken(new URLSearchParams(location.hash.slice(1)).get('room'));
@@ -32,22 +36,25 @@ function persist(){
  demoWorld.accounts[state.user.id]={joined:state.joined,saved:state.saved,liked:state.liked,invitations:state.invitations};
  demoWorld.posts=state.posts.map(({author,...p})=>p);
  Object.assign(demoWorld,{comments:state.comments,chats:state.chats,messages:state.messages});
- if(!saveLocal('fhv-demo-v2',demoWorld))throw new Error('Device storage is full. Please use a smaller photo.');
+ if(!saveLocal('fhv-demo-v2',demoWorld)&&!sharedClient)throw new Error('Device storage is full. Please use a smaller photo.');
  sharedClient?.save(demoWorld);
  const updated=hydrateDemoPosts(demoWorld);state.posts.forEach(p=>Object.assign(p,updated.find(v=>v.id===p.id)||{}));
 }
 function toast(message) { $('#toast').textContent=message; $('#toast').classList.add('visible');clearTimeout(toast.timer);toast.timer=setTimeout(()=>$('#toast').classList.remove('visible'),3500); }
 function empty(title,description,action='create',button='Create a post') { return `<div class="empty-state"><span class="empty-icon">${icon('spark',32)}</span><h3>${title}</h3><p>${description}</p>${action?`<button class="btn primary" data-action="${action}">${button}</button>`:''}</div>`; }
 function nav() { return `<nav class="bottom-nav" aria-label="Main navigation">${[['feed','home','Feed'],['trade','trade','Trade / Help'],['create','plus','Create'],['activities','calendar','Activities'],['profile','user','Profile']].map(([id,ico,label])=>`<button class="nav-item ${id==='create'?'nav-create':''} ${state.tab===id?'active':''}" ${state.tab===id?'aria-current="page"':''} data-action="${id==='create'?'create':'nav'}" data-tab="${id}" aria-label="${label}"><span class="nav-icon">${icon(ico,id==='create'?29:23,id==='create'?'create-mark':'')}</span><span class="nav-label">${label}</span></button>`).join('')}</nav>`; }
-function sidebar(){return `<aside class="sidebar"><button class="brand" data-action="nav" data-tab="feed" aria-label="FHV Friends home">${logo}</button><nav aria-label="Desktop navigation">${[['feed','home','Feed'],['trade','trade','Trade / Help'],['activities','calendar','Activities'],['profile','user','Profile']].map(([id,ico,label])=>`<button class="side-link ${state.tab===id?'active':''}" ${state.tab===id?'aria-current="page"':''} data-action="nav" data-tab="${id}">${icon(ico)}<span>${label}</span></button>`).join('')}<button class="side-link" data-action="people">${icon('people')}<span>Contacts</span></button><button class="side-link" data-action="franzi">${icon('franzi')}<span>Franzi</span></button><button class="side-link" data-action="inbox">${icon('chat')}<span>Messages${unreadMessages()?` <span class="message-count">${unreadMessages()}</span>`:''}</span></button></nav><button class="btn primary side-create" data-action="create">${icon('plus',19)} Create post</button><div class="sidebar-bottom">${isDemo()?`<button class="side-user" data-action="test-accounts">${avatar(state.user)}<span><strong>${e(state.user.name)}</strong><small>Switch profile</small></span>${icon('down',16)}</button>`:''}<button class="side-link" data-action="install">${icon('download',18)}<span>Install app</span></button><button class="sidebar-about" data-action="about">About FHV Friends</button></div></aside>`;}
-function header(){const title={feed:'Feed',trade:'Trade / Help',activities:'Activities',profile:'Profile'}[state.tab]||'Feed';return `<header class="page-header page-${state.tab}"><div class="mobile-brand">${logo}</div><div class="header-main"><div class="page-title"><span class="page-eyebrow">FHV / COMMUNITY</span><h1>${title}</h1></div><div class="header-actions"><button class="icon-btn franzi-button" data-action="franzi" aria-label="Open Franzi">${icon('franzi',25)}<span class="franzi-dot"></span></button><button class="icon-btn" data-action="inbox" aria-label="Open messages">${icon('chat')}${unreadMessages()?`<span class="message-count">${unreadMessages()}</span>`:''}</button><button class="icon-btn notification-btn" data-action="notifications" aria-label="Invitations and updates">${icon('bell')}${!state.noticeRead&&pendingInvites().length?'<span class="notification-dot"></span>':''}</button></div></div></header>`;}
+function sidebar(){return `<aside class="sidebar"><button class="brand" data-action="refresh" aria-label="Refresh FHV Friends">${logo}</button><nav aria-label="Desktop navigation">${[['feed','home','Feed'],['trade','trade','Trade / Help'],['activities','calendar','Activities'],['profile','user','Profile']].map(([id,ico,label])=>`<button class="side-link ${state.tab===id?'active':''}" ${state.tab===id?'aria-current="page"':''} data-action="nav" data-tab="${id}">${icon(ico)}<span>${label}</span></button>`).join('')}<button class="side-link" data-action="people">${icon('people')}<span>Contacts</span></button><button class="side-link" data-action="franzi">${icon('franzi')}<span>Franzi</span></button><button class="side-link" data-action="inbox">${icon('chat')}<span>Messages${unreadMessages()?` <span class="message-count">${unreadMessages()}</span>`:''}</span></button></nav><button class="btn primary side-create" data-action="create">${icon('plus',19)} Create post</button><div class="sidebar-bottom">${isDemo()?`<button class="side-user" data-action="test-accounts">${avatar(state.user)}<span><strong>${e(state.user.name)}</strong><small>Switch profile</small></span>${icon('down',16)}</button>`:''}<button class="side-link" data-action="install">${icon('download',18)}<span>Install app</span></button><button class="sidebar-about" data-action="about">About FHV Friends</button></div></aside>`;}
+function header(){const title={feed:'Feed',trade:'Trade / Help',activities:'Activities',profile:'Profile'}[state.tab]||'Feed';return `<header class="page-header page-${state.tab}"><button class="mobile-brand" data-action="refresh" aria-label="Refresh FHV Friends">${logo}</button><div class="header-main"><div class="page-title"><span class="page-eyebrow">FHV / COMMUNITY</span><h1>${title}</h1></div><div class="header-actions"><button class="icon-btn" data-action="inbox" aria-label="Open messages">${icon('chat')}${unreadMessages()?`<span class="message-count">${unreadMessages()}</span>`:''}</button><button class="icon-btn notification-btn" data-action="notifications" aria-label="Invitations and updates">${icon('bell')}${!state.noticeRead&&pendingInvites().length?'<span class="notification-dot"></span>':''}</button><button class="icon-btn franzi-button" data-action="franzi" aria-label="Open Franzi">${icon('franzi',25)}<span class="franzi-dot"></span></button></div></div></header>`;}
 function statusBanner(){return '';}
 function chips(items,selected,action='filter') { return `<div class="chips" role="group" aria-label="Filter">${items.map(f=>`<button class="chip ${selected===f?'selected':''}" aria-pressed="${selected===f}" data-action="${action}" data-value="${f}">${f}</button>`).join('')}</div>`; }
 function searchBox(placeholder='What are you looking for?') { return `<label class="search-box">${icon('search',20)}<input id="search" type="search" value="${e(state.query)}" placeholder="${placeholder}" aria-label="${placeholder}" autocomplete="off"><kbd>/</kbd></label>`; }
 function authorLine(p) { return `<div class="author-line"><button class="person-avatar" data-action="person" data-id="${p.author_id}" aria-label="Profile of ${e(p.author?.name)} open">${avatar(p.author)}</button><div><button class="author-name" data-action="person" data-id="${p.author_id}"><strong>${e(p.author?.name || 'Campus member')}${p.pinned||p.author?.role==='oh'?'<span class="verified" title="Students’ union">'+icon('check',11)+'</span>':''}</strong></button><small>${e(p.author?.course || 'FHV')} · ${relative(p.created_at)}</small></div><button class="icon-btn small card-more" data-action="post-menu" data-id="${p.id}" aria-label="Post options">${icon('more',20)}</button></div>`; }
 function bookmarkButton(p) { const saved=state.saved.includes(p.id);return `<button class="icon-btn small ${saved?'is-saved':''}" data-action="save" data-id="${p.id}" aria-label="${saved?'Remove from saved':'Save post'}" aria-pressed="${saved}">${icon('bookmark',19)}</button>`; }
 function hero(p){
- return `<article class="pinned-post"><div class="pinned-feature"><div class="pinned-label">${icon('pin',15)} ÖH FHV <span>PINNED</span></div><button class="text-link pinned-title" data-action="detail" data-id="${p.id}"><h2>${e(p.title)}</h2></button><div class="pinned-bottom"><span>${icon('map',15)} ${e(p.location)}</span><button class="btn primary" data-action="detail" data-id="${p.id}">View</button></div></div><button class="feature-date" data-action="detail" data-id="${p.id}" aria-label="${e(p.title)} view"><span>${dateLabel(p.starts_at,{weekday:'short'}).split(',')[0]}</span><strong>${new Date(p.starts_at).getDate()}</strong><small>${dateLabel(p.starts_at,{month:'long'}).replace(/\d+\.?\s*/,'')}</small><span>${timeLabel(p.starts_at)} </span></button></article>`;
+ return `<article class="pinned-post" data-key="featured-${p.id}"><div class="pinned-feature"><div class="pinned-label">${icon(p.pinned?'pin':'calendar',15)} ${e(p.author?.name||'FHV')} <span>${p.pinned?'PINNED':'UP NEXT'}</span></div><button class="text-link pinned-title" data-action="detail" data-id="${p.id}"><h2>${e(p.title)}</h2></button><div class="pinned-bottom"><span>${icon('map',15)} ${e(p.location)}</span><button class="btn primary" data-action="detail" data-id="${p.id}">View</button></div></div><button class="feature-date" data-action="detail" data-id="${p.id}" aria-label="${e(p.title)} view"><span>${dateLabel(p.starts_at,{weekday:'short'}).split(',')[0]}</span><strong>${new Date(p.starts_at).getDate()}</strong><small>${dateLabel(p.starts_at,{month:'long'}).replace(/\d+\.?\s*/,'')}</small><span>${timeLabel(p.starts_at)}</span></button></article>`;
+}
+function featuredCarousel(posts){
+ return `<section class="featured-carousel" aria-label="Featured events"><div class="featured-track" id="featured-events" tabindex="0" aria-label="Featured events. Swipe or use the arrow buttons.">${posts.map(p=>hero(p)).join('')}</div><div class="featured-controls"><button class="icon-btn small" data-action="featured-prev" aria-label="Previous featured event" disabled>${icon('chevron',17,'back-icon')}</button><span class="featured-position" aria-live="polite">1 / ${posts.length}</span><div class="featured-dots">${posts.map((p,i)=>`<button data-action="featured-slide" data-index="${i}" class="${i===0?'selected':''}" aria-label="Featured event ${i+1}: ${e(p.title)}" aria-current="${i===0?'true':'false'}"></button>`).join('')}</div><button class="icon-btn small" data-action="featured-next" aria-label="Next featured event" ${posts.length<2?'disabled':''}>${icon('chevron',17)}</button></div></section>`;
 }
 
 function miniAvatars(){return '';}
@@ -57,10 +64,16 @@ function postCard(p,{compact=false}={}){
  const label=ride?'Ride':p.type==='trade'?(Number(p.price)>0?'For sale':'Free stuff'):TYPES[p.type];
  const liked=state.liked.includes(p.id),poster=activity&&!hasPhoto;
  const cover=hasPhoto?`<button class="card-visual" data-action="detail" data-id="${p.id}" aria-label="${e(p.title)} view"><img src="${e(safeImage(p.image_data))}" alt="${e(p.title)}" loading="lazy"></button>`:poster?`<button class="event-poster ${tone}" data-action="detail" data-id="${p.id}"><span class="poster-top"><span>${e(ride?'Rides':p.category)}</span><span>${dateLabel(p.starts_at,{weekday:'short'})}</span></span><h3>${e(p.title)}</h3><span class="poster-bottom"><span>${icon(ride?'car':'calendar',18)} ${timeLabel(p.starts_at)} </span>${icon(ride?'car':p.category==='Study'?'book':p.category==='Culture'?'coffee':'people',42)}</span></button>`:'';
- return `<article class="post-card tone-${tone} ${poster?'has-poster':''} ${compact?'compact':''}">${authorLine(p)}${cover}<div class="card-body"><div class="card-kicker"><span class="type-label ${tone}">${e(label)}</span>${p.type==='help'?`<span class="secondary-label">${p.help_direction==='request'?'Looking for help':'Offering help'}</span>`:''}${p.status==='reserved'?'<span class="reserved-label">Reserved</span>':''}</div>${!poster?`<button class="text-link card-title" data-action="detail" data-id="${p.id}"><h3>${e(p.title)}</h3></button>`:''}<p class="card-description">${e(p.description)}</p><div class="card-meta">${icon('map',15)} ${e(p.location)}${ride?`<span class="ride-route">${e(p.ride_destination)} · ${Math.max(0,p.capacity-count(p))} available · ${Number(p.price).toLocaleString('en-GB')} €</span>`:''}</div><div class="card-footer"><button class="like-btn ${liked?'liked':''}" aria-label="Like" aria-pressed="${liked}" data-action="like" data-id="${p.id}">${icon('heart',19)}<span>${Number(p.likes||0)}</span></button>${activity?`<span class="going-label">${count(p)} going</span>`:`<span class="price-label">${p.price?`${Number(p.price).toLocaleString('en-GB')} €`:'Free'}</span>`}<div class="card-footer-right">${bookmarkButton(p)}<button class="btn small ${joined(p.id)?'joined':'soft'}" data-action="detail" data-id="${p.id}">${activity?(joined(p.id)?icon('check',14)+' Going':full(p)?'Full':'Join'):p.type==='help'?'Contact':'View'}</button></div></div></div></article>`;
+ return `<article data-key="post-${p.id}" class="post-card tone-${tone} ${poster?'has-poster':''} ${compact?'compact':''}">${authorLine(p)}${cover}<div class="card-body"><div class="card-kicker"><span class="type-label ${tone}">${e(label)}</span>${p.type==='help'?`<span class="secondary-label">${p.help_direction==='request'?'Looking for help':'Offering help'}</span>`:''}${p.status==='reserved'?'<span class="reserved-label">Reserved</span>':''}</div>${!poster?`<button class="text-link card-title" data-action="detail" data-id="${p.id}"><h3>${e(p.title)}</h3></button>`:''}<p class="card-description">${e(p.description)}</p><div class="card-meta">${icon('map',15)} ${e(p.location)}${ride?`<span class="ride-route">${e(p.ride_destination)} · ${Math.max(0,p.capacity-count(p))} available · ${Number(p.price).toLocaleString('en-GB')} €</span>`:''}</div><div class="card-footer"><button class="like-btn ${liked?'liked':''}" aria-label="Like" aria-pressed="${liked}" data-action="like" data-id="${p.id}">${icon('heart',19)}<span>${Number(p.likes||0)}</span></button>${activity?`<span class="going-label">${count(p)} going</span>`:`<span class="price-label">${p.price?`${Number(p.price).toLocaleString('en-GB')} €`:'Free'}</span>`}<div class="card-footer-right">${bookmarkButton(p)}<button class="btn small ${joined(p.id)?'joined':'soft'}" data-action="detail" data-id="${p.id}">${activity?(joined(p.id)?icon('check',14)+' Going':full(p)?'Full':'Join'):p.type==='help'?'Contact':'View'}</button></div></div></div></article>`;
 }
 
-function feed() { const all = filterPosts(state.posts,{tab:'feed',filter:state.filter,query:state.query}); const featured = state.filter==='All'&&!state.query?all.find(p=>p.pinned&&p.type==='activity'):null; const rest=all.filter(p=>p.id!==featured?.id); return `${searchBox('Search campus')}${chips(['All','Activities','For sale','Free stuff','Food','Help','Campus life'],state.filter)}<div id="feed-results">${featured?hero(featured):''}<div class="section-heading"><h2>${state.query?'Search results':state.filter==='All'?'Posts':state.filter}</h2><span>${rest.length} Posts</span></div><div class="post-grid">${rest.length?rest.map(p=>postCard(p)).join(''):empty('No posts found.','Try another search.')}</div></div>`; }
+function feed(){
+ const all=filterPosts(state.posts,{tab:'feed',filter:state.filter,query:state.query});
+ const pinned=state.filter==='All'&&!state.query?all.find(p=>p.pinned&&p.type==='activity'):null;
+ const upcoming=all.filter(p=>p.type==='activity'&&p.id!==pinned?.id&&new Date(p.starts_at)>new Date()).sort((a,b)=>new Date(a.starts_at)-new Date(b.starts_at)).slice(0,4);
+ const rest=all.filter(p=>p.id!==pinned?.id);
+ return `${searchBox('Search campus')}${chips(['All','Activities','For sale','Free stuff','Food','Help','Campus life'],state.filter)}<div id="feed-results">${pinned?featuredCarousel([pinned,...upcoming]):''}<div class="section-heading"><h2>${state.query?'Search results':state.filter==='All'?'Posts':state.filter}</h2><span>${rest.length} Posts</span></div><div class="post-grid">${rest.length?rest.map(p=>postCard(p)).join(''):empty('No posts found.','Try another search.')}</div></div>`;
+}
 function trade(){const posts=filterPosts(state.posts,{tab:'trade',filter:state.filter});return `${chips(['All','For sale','Free stuff','Food','Help'],state.filter)}<div class="section-heading"><h2>${state.filter==='All'?'Trade / Help':state.filter}</h2><button class="text-link" data-action="create-trade">${icon('plus',16)} Create post</button></div><div class="post-grid">${posts.length?posts.map(p=>postCard(p)).join(''):empty('No posts yet.','Post something to get started.')}</div>`;}
 function invitationCard(inv) { const p=state.posts.find(x=>x.id===inv.post_id);if(!p)return '';const who=p.author?.name||'Campus'; return `<article class="invitation-card ${inv.sender_id==='demo-oh'||p.pinned?'yellow':'lavender'}"><span class="tiny-label">${e(who)} ${p.pinned?'· OFFICIAL':'INVITED YOU'}</span><h3>${e(p.subtitle||p.title)}</h3><p>${dateLabel(p.starts_at,{weekday:'short'})} · ${timeLabel(p.starts_at)}</p><small>${e(p.location)} · ${count(p)} going</small><div class="invitation-actions"><button class="btn primary" data-action="accept" data-id="${inv.id}">${icon('check',16)} Accept invitation</button><button class="btn translucent" data-action="decline" data-id="${inv.id}">Not now</button></div></article>`; }
 function activities(){const invites=pendingInvites();const posts=filterPosts(state.posts,{tab:'activities',filter:state.filter,query:state.query,activityTab:state.activityTab,userId:state.user.id,joined:state.joined});return `<div class="segment-control activity-segments">${['Discover','Invitations','My plans'].map(v=>`<button class="${state.activityTab===v?'selected':''}" data-action="activity-tab" data-value="${v}">${v}${v==='Invitations'&&invites.length?`<span class="count-badge">${invites.length}</span>`:''}</button>`).join('')}</div>${state.activityTab==='Invitations'?`<div class="invitation-list">${invites.length?invites.map(invitationCard).join(''):empty('No pending invitations.','',null)}</div>`:`${searchBox('Search activities')}${chips(CATEGORIES,state.filter)}<div class="section-heading"><h2>${state.activityTab==='My plans'?'My plans':'Upcoming activities'}</h2><button class="text-link ride-offer" data-action="create-ride">Offer a ride</button></div><div class="post-grid activity-grid">${posts.length?posts.map(p=>postCard(p)).join(''):empty('No activities yet.','',state.activityTab==='My plans'?'discover':'create',state.activityTab==='My plans'?'Discover':'Create activity')}</div>`}`;}
@@ -70,7 +83,27 @@ function profile(){
  return `<section class="profile-card"><div class="profile-content"><div class="profile-heading">${avatar(state.user,'large')}<button class="btn outline small" data-action="edit-profile">Edit profile</button></div><h2>${e(state.user.name)}</h2>${sharedClient?`<small class="presentation-status" role="status">${sharedStatusText()}</small>`:''}${state.user.course?`<p class="profile-course">${e(state.user.course)}</p>`:''}${!isDemo()?`<span class="verified-label">${icon('shield',14,'system-icon')} FHV email verified</span>`:''}${state.user.bio?`<p class="profile-bio">${e(state.user.bio)}</p>`:''}<div class="interest-chips">${(state.user.interests||[]).map(v=>`<span>${e(v)}</span>`).join('')}</div><div class="profile-stats"><div><strong>${state.joined.length}</strong><span>Going</span></div><div><strong>${mine.length}</strong><span>Posts</span></div><div><strong>${state.saved.length}</strong><span>Saved</span></div></div></div></section><section class="menu-section"><h2>Your campus</h2><div class="profile-menu">${entry('people','Contacts','people')}${entry('saved','Saved posts','bookmark')}${entry('my-posts','My posts','user')}</div></section><section class="menu-section"><h2>Settings</h2><div class="profile-menu">${isDemo()?entry('test-accounts','Switch profile','user'):''}${isDemo()?entry('presentation','Presentation room','wifi'):''}${entry('install','Install app','download')}${entry('about','About FHV Friends','shield')}${entry(isDemo()?'auth':'logout',isDemo()?'Sign in with FHV email':'Sign out','logout')}</div></section>`;
 }
 function rightRail(){return '';}
-function render() { $('#app').innerHTML=`<div class="app-shell">${sidebar()}<div class="main-shell">${statusBanner()}<div class="content-layout"><main id="main" tabindex="-1">${header()}<div class="page-content ${state.tab}-page">${state.loading?'<div class="loading-state"><span class="spinner"></span><p>Loading…</p></div>':({feed,trade,activities,profile}[state.tab]||feed)()}</div></main>${state.tab!=='profile'?rightRail():''}</div></div>${nav()}</div>`; }
+function render(){
+ const content=state.loading?'<div class="loading-state"><span class="spinner"></span><p>Loading…</p></div>':({feed,trade,activities,profile}[state.tab]||feed)();
+ const root=$('#app');
+ if(typeof document.createElement!=='function'){
+  root.innerHTML=`<div hidden id="campus-icons">${ICON_SPRITE}</div><div class="app-shell">${sidebar()}<div class="main-shell"><div class="content-layout"><main id="main" tabindex="-1">${header()}<div class="page-content ${state.tab}-page">${content}</div></main></div></div>${nav()}</div>`;
+  return;
+ }
+ if(!root.dataset.shellMounted){
+  root.innerHTML=`<div hidden id="campus-icons">${ICON_SPRITE}</div><div class="app-shell"><div class="sidebar-region"></div><div class="main-shell"><div class="content-layout"><main id="main" tabindex="-1"><div class="refresh-indicator" role="status" hidden></div><div class="header-region"></div><div class="page-panels"></div></main></div></div><div class="nav-region"></div></div>`;
+  root.dataset.shellMounted='true';
+ }
+ updateDOM(root.querySelector('.sidebar-region'),sidebar());
+ updateDOM(root.querySelector('.header-region'),header());
+ updateDOM(root.querySelector('.nav-region'),nav());
+ const panels=root.querySelector('.page-panels');
+ let panel=panels.querySelector(`[data-panel="${state.tab}"]`);
+ if(!panel){panel=document.createElement('div');panel.className=`page-content ${state.tab}-page page-panel`;panel.dataset.panel=state.tab;panels.append(panel);}
+ panels.querySelectorAll('[data-panel]').forEach(view=>{view.hidden=view!==panel;});
+ updateDOM(panel,content);
+ updateFeaturedControls();
+}
 function navigate(tab) { state.tab=tab;state.filter='All';state.query='';history.replaceState(null,'',`#${tab}`);closeModal();render();window.scrollTo({top:0,behavior:'instant'}); }
 function modal(title,body,{wide=false,footer='',label=title,cls=''}={}) { clearInterval(chatInterval); lastFocus=document.activeElement;$('#overlay').innerHTML=`<div class="modal-backdrop" data-action="backdrop"><section class="modal ${wide?'wide':''} ${cls}" role="dialog" aria-modal="true" aria-label="${e(label)}"><div class="modal-handle"></div><header class="modal-header"><h2>${e(title)}</h2><button class="icon-btn" data-action="close" aria-label="Close">${icon('close')}</button></header><div class="modal-body">${body}</div>${footer?`<footer class="modal-footer">${footer}</footer>`:''}</section></div>`;document.body.classList.add('modal-open');$('#overlay').querySelector('button,input,textarea,select')?.focus(); }
 function closeModal() { if(state.overlay==='create'&&!state.editingId)saveDraft(false);clearInterval(chatInterval);state.overlay=null;state.selected=null;state.currentChat=null;$('#overlay').innerHTML='';document.body.classList.remove('modal-open');lastFocus?.isConnected&&lastFocus.focus(); }
@@ -148,7 +181,12 @@ async function preparePhoto(file,maxLength){
   throw new Error('Please choose a smaller photo.');
  }finally{URL.revokeObjectURL(url);}
 }
-function testAccounts(){if(!isDemo())return;state.overlay='test-accounts';modal('Switch profile',`${sharedClient?`<p class="presentation-status" role="status">${sharedStatusText()}</p><button class="text-link" data-action="presentation">Room link & settings</button>`:''}<div class="test-accounts">${demoWorld.profiles.map(p=>`<button class="test-account ${p.id===state.user.id?'current':''}" data-action="switch-account" data-id="${p.id}">${avatar(p)}<span><strong>${e(p.name)}</strong>${p.course?`<small>${e(p.course)}</small>`:''}</span>${p.id===state.user.id?icon('check',18):icon('chevron',18)}</button>`).join('')}</div>`);}
+function testAccounts(){
+ if(!isDemo())return;
+ const body=`${sharedClient?`<p class="presentation-status" role="status">${sharedStatusText()}</p>`:'<p class="form-hint">Local profiles. Use the same room link on every phone to share profiles and messages.</p>'}<button class="text-link" data-action="presentation">${sharedClient?'Room link & settings':'Join a shared presentation'}</button><div class="test-accounts">${demoWorld.profiles.map(p=>`<button class="test-account ${p.id===state.user.id?'current':''}" data-action="switch-account" data-id="${p.id}">${avatar(p)}<span><strong>${e(p.name)}</strong>${p.course?`<small>${e(p.course)}</small>`:''}</span>${p.id===state.user.id?icon('check',18):icon('chevron',18)}</button>`).join('')}</div><button class="btn outline full" data-action="edit-profile">Edit selected profile</button>`;
+ if(typeof document.createElement==='function'&&state.overlay==='test-accounts'&&$('#overlay .test-accounts')){updateDOM($('#overlay .modal-body'),body);return;}
+ state.overlay='test-accounts';modal('Switch profile',body);
+}
 function switchAccount(id){
  if(!isDemo()||!demoWorld.profiles.some(p=>p.id===id))return;
  persist();const account=demoWorld.accounts[id]||emptyDemoAccount();state.user={...demoPerson(demoWorld,id)};
@@ -159,6 +197,7 @@ function switchAccount(id){
 function chatTitle(chat){if(!chat)return 'Messages';if(!isDemo()||chat.post_id)return chat.title||'Group chat';const other=chat.members?.find(id=>id!==state.user.id);return other?demoPerson(demoWorld,other).name:chat.title||'Chat';}
 
 const actions = {
+ refresh:()=>refreshApp(), 'featured-prev':()=>moveFeatured(-1),'featured-next':()=>moveFeatured(1),'featured-slide':el=>showFeatured(Number(el.dataset.index)),
  nav:el=>navigate(el.dataset.tab),close:closeModal,backdrop:el=>{if(el===eventTarget)closeModal();},
  filter:el=>{state.filter=el.dataset.value;render();},
  'activity-tab':el=>{state.activityTab=el.dataset.value;state.filter='All';state.query='';render();},
@@ -240,7 +279,7 @@ document.addEventListener('keydown',event=>{
 window.addEventListener('beforeinstallprompt',event=>{event.preventDefault();deferredInstall=event;});
 window.addEventListener('online',()=>toast('You’re back online.'));
 window.addEventListener('offline',()=>toast('You’re offline. Previously loaded content is still available.'));
-window.addEventListener('hashchange',()=>{const hash=location.hash.slice(1);if(hash.startsWith('post/'))detail(hash.slice(5));else if(['feed','trade','activities','profile'].includes(hash))navigate(hash);});
+window.addEventListener('hashchange',()=>{const hash=location.hash.slice(1);const token=roomToken(new URLSearchParams(hash).get('room'));if(token){if(token!==currentRoom||!sharedClient)void connectPresentation(token,true);else testAccounts();}else if(hash.startsWith('post/'))detail(hash.slice(5));else if(['feed','trade','activities','profile'].includes(hash))navigate(hash);});
 render();
 if(currentRoom&&presentationEndpoint)void connectPresentation(currentRoom,Boolean(linkedRoom));
 setInterval(()=>{if(sharedClient&&!document.hidden)void sharedClient.poll();},2500);
@@ -278,12 +317,15 @@ function applySharedWorld(world){
  else if(state.overlay==='people')void people();
  else if(!state.overlay)render();
 }
-async function connectPresentation(token,choose=false){
+function connectPresentation(token,choose=false){
  if(!presentationEndpoint)throw Error('Presentation sharing is not configured.');
- const client=new PresentationSync({endpoint:presentationEndpoint,token,onChange:applySharedWorld,onStatus:syncStatus});
+ const attempt=++roomConnection;
+ const client=new PresentationSync({endpoint:presentationEndpoint,token,onChange:world=>{if(attempt===roomConnection)applySharedWorld(world);},onStatus:(status,error)=>{if(attempt===roomConnection)syncStatus(status,error);}});
  state.loading=true;closeModal();render();
- try{await client.connect();sharedClient=client;currentRoom=token;saveLocal('fhv-room-token',token);state.loading=false;render();if(choose)testAccounts();}
- catch(error){state.loading=false;render();toast(error.message);presentationModal();}
+ return client.connect().then(()=>{
+  if(attempt!==roomConnection)return;
+  sharedClient=client;currentRoom=token;saveLocal('fhv-room-token',token);state.loading=false;render();if(choose)testAccounts();
+ }).catch(error=>{if(attempt!==roomConnection)return;state.loading=false;render();toast(error.message);presentationModal();});
 }
 function presentationLink(){return location.origin+location.pathname+'#room='+currentRoom;}
 function presentationModal(){
@@ -301,3 +343,52 @@ function unreadMessages(){
  return visibleDemoChats(state.chats,state.user.id,state.joined,state.posts).reduce((sum,c)=>sum+(state.messages[c.id]||[]).filter(m=>m.author_id!==state.user.id&&new Date(m.created_at).getTime()>(seen[c.id]||0)).length,0);
 }
 function markChatRead(id){if(!isDemo())return;const seen=readLocal('fhv-chat-read-'+state.user.id,{});seen[id]=Date.now();saveLocal('fhv-chat-read-'+state.user.id,seen);}
+
+function featuredIndex(){
+ const track=$('#featured-events');if(!track?.children?.length)return 0;
+ const origin=track.firstElementChild.offsetLeft;
+ return [...track.children].reduce((best,slide,i,all)=>Math.abs(slide.offsetLeft-origin-track.scrollLeft)<Math.abs(all[best].offsetLeft-origin-track.scrollLeft)?i:best,0);
+}
+function updateFeaturedControls(){
+ if(typeof document.createElement!=='function')return;
+ const track=$('#featured-events');if(!track)return;
+ const index=featuredIndex(),total=track.children.length;
+ const region=track.closest('.featured-carousel');
+ region.querySelector('[data-action="featured-prev"]').disabled=index===0;
+ region.querySelector('[data-action="featured-next"]').disabled=index===total-1;
+ region.querySelector('.featured-position').textContent=`${index+1} / ${total}`;
+ region.querySelectorAll('[data-action="featured-slide"]').forEach((dot,i)=>{dot.classList.toggle('selected',i===index);dot.setAttribute('aria-current',i===index?'true':'false');});
+}
+function showFeatured(index){
+ const track=$('#featured-events');if(!track?.children?.length)return;
+ const slide=track.children[Math.max(0,Math.min(index,track.children.length-1))];
+ track.scrollTo({left:slide.offsetLeft-track.firstElementChild.offsetLeft,behavior:window.matchMedia?.('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});
+}
+function moveFeatured(direction){showFeatured(featuredIndex()+direction);}
+function setPullDistance(distance){
+ if(state.refreshing&&distance===0)return;
+ const indicator=$('.refresh-indicator');if(!indicator)return;
+ indicator.hidden=distance===0&&!state.refreshing;
+ indicator.textContent=state.refreshing?'Refreshing…':distance>=61?'Release to refresh':'Pull to refresh';
+ indicator.style.setProperty('--pull-offset',`${Math.min(82,distance)}px`);
+}
+async function refreshApp(){
+ if(state.refreshing)return;
+ state.refreshing=true;setPullDistance(62);
+ try{
+  if(sharedClient)await sharedClient.refresh();
+  else if(!isDemo()){
+   const [posts,userState,memberships]=await Promise.all([api.posts(),api.state(state.user.id),api.memberships()]);
+   state.posts=posts.map(p=>({...p,price:Number(p.price||0),likes:Number(p.likes||0),join_count:memberships.filter(m=>m.post_id===p.id).length}));Object.assign(state,userState);
+  }else{const saved=readLocal('fhv-demo-v2',null);if(saved)applySharedWorld(createDemoWorld(saved));}
+  render();toast('Up to date.');
+ }catch(error){toast(error.message||'Could not refresh. Please try again.');}
+ finally{state.refreshing=false;setPullDistance(0);}
+}
+function startAppGestures(){
+ if(typeof document.createElement!=='function')return;
+ installGestures({target:document,isBlocked:()=>Boolean(state.overlay||state.refreshing),isMobile:()=>window.innerWidth<=760,onPull:setPullDistance,onRefresh:()=>void refreshApp(),onSwipe:(dx,dy,duration)=>{const tab=swipeDestination(state.tab,dx,dy,duration);if(tab)navigate(tab);}});
+ document.addEventListener('scroll',event=>{if(event.target.matches?.('.featured-track'))updateFeaturedControls();},true);
+ document.addEventListener('keydown',event=>{if(event.target.closest?.('.featured-track')&&['ArrowLeft','ArrowRight'].includes(event.key)){event.preventDefault();moveFeatured(event.key==='ArrowRight'?1:-1);}});
+}
+startAppGestures();
